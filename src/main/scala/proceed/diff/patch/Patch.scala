@@ -1,4 +1,4 @@
-package org.proceed.diff.patch
+package proceed.diff.patch
 
 /**
   * Created by tiberius on 08.06.16.
