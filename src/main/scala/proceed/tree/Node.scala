@@ -12,13 +12,23 @@ trait Node {
     this
   }
 
+  /*
+  def @#(name: String) = {
+    as(name)
+  }
+  */
+
+}
+
+object EmptyNode extends Node {
+  name = None
 }
 
 abstract class Element extends Node {
   p: Product =>
 
   //TODO: make optional
-  var children: Option[mutable.LinkedHashMap[String, Node]] = None
+  var children = new ChildMap
 
   def apply(c: Node, cs: Node*): Element = {
     apply(c +: cs)
@@ -26,10 +36,9 @@ abstract class Element extends Node {
   }
 
   def apply(cs: Seq[Node]) = {
-    children = Some(new mutable.LinkedHashMap[String, Node]())
 
     cs.zipWithIndex.foreach {
-      case (n: Node, i: Int) => children.get.put(n.name.getOrElse(i.toString), n)
+      case (n: Node, i: Int) => children.add(i, n)
     }
 
     this
