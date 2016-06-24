@@ -1,11 +1,11 @@
 package proceed.tree
 
-import scala.collection.mutable
-
 
 trait Node {
   var path: String = _
   var name: Option[String] = None
+
+  val typeName: String
 
   def as(name: String) = {
     this.name = Some(name)
@@ -22,6 +22,7 @@ trait Node {
 
 object EmptyNode extends Node {
   name = None
+  val typeName = "_EmptyNode"
 }
 
 abstract class Element extends Node {
