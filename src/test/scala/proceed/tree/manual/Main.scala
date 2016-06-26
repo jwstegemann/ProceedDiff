@@ -2,6 +2,7 @@ package proceed.tree.manual
 
 import proceed.tree.{Element, Node}
 import proceed.tree.html.{button, div, p}
+import proceed.util.PrettyPrinter
 
 /**
   * Created by tiberius on 10.06.16.
@@ -16,12 +17,18 @@ object Main {
       p(title=Some("p7")) as "p7"
     )
 
+    println("Old DOM:")
+    println(PrettyPrinter(oldDom))
+
     val newDom = div()(
       p(title=Some("p8")) as "p8",
       p(title=Some("p3")) as "p3",
       p(title=Some("p6")) as "p6",
       p(title=Some("p7")) as "p7"
     )
+
+    println("New DOM:")
+    println(PrettyPrinter(newDom))
 
    /* val oldDom = div()(
       p(title=Some("o3")),

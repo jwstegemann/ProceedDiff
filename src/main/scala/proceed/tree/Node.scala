@@ -28,8 +28,10 @@ object EmptyNode extends Node {
 abstract class Element extends Node {
   p: Product =>
 
+  val fields: Seq[String]
+
   //TODO: make optional
-  var children = new ChildMap
+  var children: ChildMap = NoChildsMap
 
   def apply(c: Node, cs: Node*): Element = {
     apply(c +: cs)
@@ -37,6 +39,7 @@ abstract class Element extends Node {
   }
 
   def apply(cs: Seq[Node]) = {
+    children = new ChildMapImpl
 
     cs.zipWithIndex.foreach {
       case (n: Node, i: Int) => children.add(i, n)
@@ -50,3 +53,5 @@ abstract class Element extends Node {
   }
 
 }
+
+case class TextNode(content: String) extends Node
