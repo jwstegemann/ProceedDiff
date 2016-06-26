@@ -3,12 +3,13 @@ package proceed.tree
 
 trait Node {
   var path: String = _
-  var name: Option[String] = None
+  var id: String = _
+  var key: Option[String] = None
 
-  val typeName: String
+  lazy val nodeType: String = this.getClass.getSimpleName()
 
   def as(name: String) = {
-    this.name = Some(name)
+    this.key = Some(name)
     this
   }
 
@@ -21,8 +22,7 @@ trait Node {
 }
 
 object EmptyNode extends Node {
-  name = None
-  val typeName = "_EmptyNode"
+  key = Some("")
 }
 
 abstract class Element extends Node {
