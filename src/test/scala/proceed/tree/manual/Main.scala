@@ -11,14 +11,12 @@ object Main {
 
   def main(args: Array[String]) {
 
-    val oldDom = div()(
+    /*val oldDom = div()(
       p(title=Some("p3")) as "p3",
       p(title=Some("p4")) as "p4",
       p(title=Some("p7")) as "p7"
     )
 
-    println("Old DOM:")
-    println(PrettyPrinter(oldDom))
 
     val newDom = div()(
       p(title=Some("p8")) as "p8",
@@ -26,11 +24,9 @@ object Main {
       p(title=Some("p6")) as "p6",
       p(title=Some("p7")) as "p7"
     )
+*/
 
-    println("New DOM:")
-    println(PrettyPrinter(newDom))
-
-   /* val oldDom = div()(
+    val oldDom = div()(
       p(title=Some("o3")),
       div(title=Some("o5")),
       button(title=Some("o7"))
@@ -40,8 +36,12 @@ object Main {
       div(title=Some("p5")),
       p(title=Some("p3")),
       button(title=Some("p7"))
-    )*/
+    )
 
+    println("Old DOM:")
+    println(PrettyPrinter(oldDom))
+    println("New DOM:")
+    println(PrettyPrinter(newDom))
 
     val oldList = oldDom.children
     val newList = newDom.children
@@ -78,7 +78,8 @@ object Main {
           oldIterator.continue()
         }
       }
-      else if (!newIterator.done) {
+      //TODO: is checking für oldIterator here right?
+      else if (!oldIterator.done) {
         newList.indexOf(oldIterator.currentKey()) match {
           case Some((pos: Int, node: Node)) => {
             if (pos <= newIterator.currentPos()) {
