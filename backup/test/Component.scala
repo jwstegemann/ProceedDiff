@@ -1,4 +1,4 @@
-package org.proceed.tree
+package test
 
 /**
   * Created by tiberius on 08.06.16.

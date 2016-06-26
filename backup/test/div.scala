@@ -1,9 +1,9 @@
-package org.proceed.tree
+package test
 
 /**
   * Created by tiberius on 10.06.16.
   */
-class div() extends Element {
+case class div() extends Element {
 
 }
 

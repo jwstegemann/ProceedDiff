@@ -1,4 +1,4 @@
-package org.proceed.tree
+package test
 
 import scala.collection.mutable
 
@@ -8,5 +8,12 @@ import scala.collection.mutable
 trait Node {
 
   val children = new mutable.LinkedHashMap[String, Node]
+
+  val xtype = getClass.hashCode
+
+  def apply(nodes: Node*) = {
+    nodes.foreach(n => println(n))
+    this
+  }
 
 }

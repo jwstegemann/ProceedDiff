@@ -1,10 +1,8 @@
-package org.proceed.diff
+package test
 
 /**
   * Created by tiberius on 06.06.16.
   */
-
-import utest._
 
 object SimpleDiffTest extends TestSuite {
 

@@ -1,4 +1,4 @@
-package org.proceed.tree
+package test
 
 import scala.collection.immutable.HashMap
 
