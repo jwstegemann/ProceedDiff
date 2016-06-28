@@ -13,25 +13,32 @@ trait Node {
     this
   }
 
+  var children: ChildMap = NoChildsMap
+
   /*
   def @#(name: String) = {
     as(name)
   }
   */
 
+  def element: Element
+
 }
 
 object EmptyNode extends Node {
+  //FIXME: better unique key for empty node
   key = Some("")
+
+  override def element() = {
+    throw new UnsupportedOperationException
+  }
 }
 
 abstract class Element extends Node {
   p: Product =>
 
   val fields: Seq[String]
-
-  //TODO: make optional
-  var children: ChildMap = NoChildsMap
+  var elementDomRef: String = "unknown"
 
   def apply(c: Node, cs: Node*): Element = {
     apply(c +: cs)
@@ -52,6 +59,9 @@ abstract class Element extends Node {
     this
   }
 
+  override def element() = this
 }
+/*
+case class TextNode(content: String) extends Node {
 
-case class TextNode(content: String) extends Node
+}*/
