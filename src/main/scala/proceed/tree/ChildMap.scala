@@ -3,8 +3,6 @@ package proceed.tree
 import scala.collection.mutable
 
 trait ChildMap {
-  //def foreach[U](x: ((String, Node) => U)): Unit
-
   def add(position: Int, node: Node): Unit
   def indexOf(key: String): Option[(Int, Node)]
   def iterate(): ChildIterator

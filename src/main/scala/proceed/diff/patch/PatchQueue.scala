@@ -7,4 +7,6 @@ import scala.collection.mutable
   */
 class PatchQueue extends mutable.Queue[Patch] {
 
+  def execute() = foreach(_.apply)
+
 }

@@ -11,7 +11,7 @@ sealed trait Patch {
 
 case class CreateNewChild(parent: Element, child: Element, sibbling: Option[Node]) extends Patch {
   def apply() = {
-    println("create new Element " + child + " @ " + parent + " before " + sibbling)
+    println("create new Element " + child + " @ " + parent + " before " + sibbling.map(s => s.element))
   }
 }
 
@@ -35,7 +35,7 @@ case class SetAttribute(element: Element, attribute: String, value: String) exte
 
 case class MoveChild(parent: Element, child: Element, sibbling: Option[Node]) extends Patch {
   def apply() = {
-    println("move Element " + child + " @ " + parent + " before " + sibbling)
+    println("move Element " + child + " @ " + parent + " before " + sibbling.map(s => s.element))
   }
 }
 
