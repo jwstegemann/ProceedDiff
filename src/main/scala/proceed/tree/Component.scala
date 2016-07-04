@@ -14,7 +14,9 @@ abstract class Component extends Node {
   def view(): Element
 
   final def render(patchQueue: PatchQueue, parentElement: Element, sibling: Option[Element] ): Unit = {
-    val newChildren = ChildMap(view())
+    val child = view()
+    child.key = Some("0")
+    val newChildren = ChildMap(child)
     Diff.diff(children, newChildren, path, parentElement, patchQueue)
     children = newChildren
   }
@@ -30,6 +32,7 @@ abstract class Component extends Node {
     path = mp.id
     parent = mp
 
+    //TODO: create special ChildMap for one Element-child
     mp.children = new ChildMapImpl
     mp.children.add(0, this)
 

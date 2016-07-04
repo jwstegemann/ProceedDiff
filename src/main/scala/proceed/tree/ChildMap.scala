@@ -36,27 +36,15 @@ class ChildMapImpl extends mutable.LinkedHashMap[String, (Int, Node)] with Child
 
   override def getFirstChild(): Node = firstEntry.value._2
 
+  //FIXME: keep track of position in Iterator
   def add(position: Int, node: Node): Unit = {
-    //setting the id on the node when added to a parent node
-    node.id = node.key.getOrElse(position.toString)
 
-    // TODO: reuse instance of StringBuilder?
-    val mapKey = mutable.StringBuilder.newBuilder
-        .append(node.nodeType)
-        .append(":")
-        .append(node.id)
-        .toString
-    put(mapKey, (position, node))
-
-/*  // TODO: decide... to get keys as short as possible (type is not needed when key is present)
-    if (node.key.isEmpty) {
-      node.id = position.toString
-      put(node.nodeType + ":" + node.id, (position, node))
-    } else {
-      node.id = node.key.get
-      put(node.id, (position, node))
+    node.id = node.key match {
+      case None => s"${node.nodeType}$position}"
+      case Some(key) => key
     }
-*/
+
+    put(node.id, (position, node))
 
   }
 
