@@ -12,7 +12,7 @@ object Main {
   def main(args: Array[String]) {
 
     /*val oldDom = div()(
-      p(title=Some("p3")) as "p3",
+      p(title=Some("p3")) aes "p3",
       p(title=Some("p4")) as "p4",
       p(title=Some("p7")) as "p7"
     )
@@ -25,7 +25,6 @@ object Main {
       p(title=Some("p7")) as "p7"
     )
 */
-
     val oldDom = div()(
       p(title=Some("o3")),
       div(title=Some("o5")),
@@ -100,6 +99,27 @@ object Main {
       }
 
     }
+
+    // CASE
+
+/*
+    case class Test(a:String, b: Int, c:Option[Int])
+
+    val fields: Seq[String] = "a" :: "b" :: "c" :: Nil
+
+    val x = Test("a",17,None)
+    val y = Test("b",18,Some(1))
+
+/*    def getElements(product: Product) = for (
+      index <- Range(0, fields.length);
+      fieldName <- fields(index)
+      ) yield (fieldName, product.productElement(index))
+
+    def getElements(oldProduct: Product, newProduct: Product) = fields.iterator.zip(oldProduct.productIterator.zip(newProduct.productIterator))
+
+    for (v <- getElements(x,y)) { println(v) }
+*/
+*/
 
   }
 

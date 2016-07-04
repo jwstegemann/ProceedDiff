@@ -60,6 +60,8 @@ abstract class Element extends Node {
   }
 
   override def element() = this
+
+  def iterator = p.productIterator
 }
 /*
 case class TextNode(content: String) extends Node {

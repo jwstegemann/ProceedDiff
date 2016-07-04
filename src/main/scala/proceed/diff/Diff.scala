@@ -1,112 +1,123 @@
 package proceed.diff
 
-import patch.{InsertNewChild, Patch, PatchQueue}
-import proceed.tree.{ChildMap, Component, Element, Node}
-
-import scala.collection.mutable.LinkedHashMap
+import proceed.diff.patch._
+import proceed.tree._
 
 /**
   * Created by tiberius on 10.06.16.
   */
 object Diff {
 
-  def reuseElement() = {
-
+  // TODO: write macro for this
+  def compareAndPatchAttributes(oldElement: Element, newElement: Element, patchQueue: PatchQueue): Unit = {
+    for ((name, (oldValue, newValue)) <- oldElement.fields.iterator.zip(oldElement.iterator.zip(newElement.iterator))) {
+      newValue match {
+        case None => patchQueue.enqueue(RemoveAttribute(newElement,name))
+        case optionalValue: Some[_] => patchQueue.enqueue(SetAttribute(newElement, name, optionalValue.get.toString))
+        case value => patchQueue.enqueue(SetAttribute(newElement, name, value.toString))
+      }
+    }
   }
 
-  def reuseComponent() = {
+  // reuse node at the same place (id stays the same)
+  def reuse(parent: Element, oldNode: Node, newNode: Node, patchQueue: PatchQueue) = {
+    (oldNode, newNode) match {
+      case (oldElement: Element, newElement: Element) => {
+        println("reuse Element")
+        compareAndPatchAttributes(oldElement, newElement, patchQueue)
+        // continue comparing children
+        //TODO: better non-recursive
+        diff(oldElement.children, newElement.children, newElement, patchQueue)
+      }
+      case (oldComponent: Component, newComponent: Component) => {
+        println("reuse Component")
 
+        if (oldComponent == newComponent) {
+          // take children
+          newComponent.children = oldComponent.children
+        }
+        else {
+          newComponent.parametersChanged()
+          if (newComponent.shouldRender()) newComponent.render(patchQueue, parent, None)
+        }
+      }
+    }
   }
 
-  def reuseAndMoveComponent() = {
-
+  // move node to another place and reuse (id changes)
+  def move(parent: Element, oldNode: Node, newNode: Node, sibbling: Option[Node], patchQueue: PatchQueue) = {
+    patchQueue.enqueue(MoveChild(parent, newNode.element, sibbling))
+    //FIXME: this might result an the deletion of the just created node (for components)
+    reuse(parent, oldNode, newNode, patchQueue)
   }
 
-  def reuseAndMoveElement() = {
-
+  def insertOrAppendNew(parent: Element, node: Node, sibbling: Option[Node], patchQueue: PatchQueue) = {
+    node match {
+      // # create " + newIterator.currentItem + " before " + beforeItem)
+      case element: Element => {
+        patchQueue.enqueue(CreateNewChild(parent, element, sibbling))
+        diff(NoChildsMap, element.children, element, patchQueue)
+      }
+      case component: Component => {
+        component.render(patchQueue, parent, sibbling.map(s => s.element))
+      }
+    }
   }
 
-  def insertNewElement() = {
-    patchQueue.enqueue(
-      InsertNewChild(parentElement, newIterator.currentItem.element, beforeItem.element))
-  }
-
-  def appendNewElement() = {
-    println("# append " + newIterator.currentItem)
-
-  }
-
-  def insertNewComponent() = {
-
-  }
-
-  def appendNewComponent() = {
-
-  }
-
-  def deleteElement() = {
-
-  }
-
-  def deleteComponent() = {
-
+  def delete(parent: Element, node: Node, patchQueue: PatchQueue) = {
+    node match {
+      case element: Element => patchQueue.enqueue(DeleteChild(parent, element))
+      case component: Component => {
+        component.isRemoved()
+        patchQueue.enqueue(DeleteChild(parent, component.element))
+      }
+    }
   }
 
   //FIXME: is parent needed here
   def diff(oldList: ChildMap, newList: ChildMap, parentElement: Element, patchQueue: PatchQueue) : Unit = {
 
-    val oldIterator = oldList.iterate
-    val newIterator = newList.iterate
+    val oldIterator = oldList.iterate()
+    val newIterator = newList.iterate()
 
     while (!(newIterator.done && oldIterator.done)) {
 
       println("comparing old(" + oldIterator.currentKey + ") with new(" + newIterator.currentKey + ")")
 
+      // reuse if same type at same position
       if (oldIterator.currentKey == newIterator.currentKey) {
 
-        println("...reuse " + oldIterator.currentItem + " for " + newIterator.currentItem)
+        reuse(parentElement, oldIterator.currentItem, newIterator.currentItem, patchQueue)
 
-        (oldIterator.currentItem, newIterator.currentItem) match {
-          case (oldElement:Element, newElement: Element) => reuseElement()
-          case (oldComponent: Component, newComponent: Component) => reuseComponent()
-        }
         oldIterator.continue()
         newIterator.continue()
       }
+      // insert new node
       if (!newIterator.done && oldList.indexOf(newIterator.currentKey()).isEmpty) {
-        (newIterator.currentItem, newIterator.lastItem) match {
-          // # create " + newIterator.currentItem + " before " + beforeItem)
-          case (element: Element, Some(beforeItem: Node)) => insertNewElement()
-          case (element: Element, None) => appendNewElement()
-          case (component: Component, Some(beforeItem: Node)) => insertNewComponent()
-          case (component: Component, None) => appendNewComponent()
-        }
+        insertOrAppendNew(parentElement, newIterator.currentItem, newIterator.lastItem, patchQueue)
         newIterator.continue()
 
+        // delete old nodes that are not needed anymore in the same step
         if (oldIterator.currentItem().key.isEmpty) {
-          oldIterator.currentItem match {
-            case component: Component => deleteComponent(parentElement, component)
-            case element: Element => deleteElement(parentElement, element)
-          }
+          delete(parentElement, oldIterator.currentItem, patchQueue)
           oldIterator.continue()
         }
       }
       //TODO: is checking für oldIterator here right?
       else if (!oldIterator.done) {
+        // move node if possible (key is implicitly present)
         newList.indexOf(oldIterator.currentKey()) match {
           case Some((pos: Int, node: Node)) => {
             if (pos <= newIterator.currentPos()) {
-              newIterator.lastItem match {
-                case Some(beforeItem: Node) => println("# move " + newIterator.currentItem + " before " + beforeItem)
-                case None => println("# move " + newIterator.currentKey + " to end")
-              }
+              move(parentElement, oldIterator.currentItem, newIterator.currentItem, newIterator.lastItem, patchQueue)
               newIterator.continue()
             } else {
               oldIterator.continue()
             }
           }
+          // delete if it is finally not needed
           case None => {
-            println("# delete " + oldIterator.currentItem)
+            delete(parentElement, oldIterator.currentItem, patchQueue)
             oldIterator.continue()
           }
         }
