@@ -1,5 +1,6 @@
 package proceed.tree.html
 
+import proceed.events.Click
 import proceed.tree.Element
 
 case class button(accessKey: Option[String] = None,
@@ -26,8 +27,8 @@ case class button(accessKey: Option[String] = None,
     "dir" ::
     "className" :: Nil
 
- /* def onClick(handler: (Click.Event => Unit)): button = {
+  def onClick(handler: (Click.Event => Unit)): button = {
     on(Click)(handler)
     this
-  }*/
+  }
 }

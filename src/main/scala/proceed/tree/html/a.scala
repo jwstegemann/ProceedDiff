@@ -1,5 +1,6 @@
 package proceed.tree.html
 
+import proceed.events.{Blur, Focus}
 import proceed.tree.Element
 
 //import proceed.{Focus, Blur}
@@ -39,7 +40,7 @@ case class a(accessKey: Option[String] = None,
     "dir" ::
     "className" :: Nil
 
-  /*
+
   def onBlur(handler: (Blur.Event => Unit)): a = {
     on(Blur)(handler)
     this
@@ -48,6 +49,6 @@ case class a(accessKey: Option[String] = None,
   def onFocus(handler: (Focus.Event => Unit)): a = {
     on(Focus)(handler)
     this
-  }*/
+  }
 
 }

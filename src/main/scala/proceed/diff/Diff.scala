@@ -11,10 +11,12 @@ object Diff {
   // TODO: write macro for this
   def compareAndPatchAttributes(oldElement: Element, newElement: Element, patchQueue: PatchQueue): Unit = {
     for ((name, (oldValue, newValue)) <- oldElement.fields.iterator.zip(oldElement.iterator.zip(newElement.iterator))) {
-      newValue match {
-        case None => patchQueue.enqueue(RemoveAttribute(newElement,name))
-        case optionalValue: Some[_] => patchQueue.enqueue(SetAttribute(newElement, name, optionalValue.get.toString))
-        case value => patchQueue.enqueue(SetAttribute(newElement, name, value.toString))
+      if (oldValue != newValue) {
+        newValue match {
+          case None => patchQueue.enqueue(RemoveAttribute(newElement, name))
+          case optionalValue: Some[_] => patchQueue.enqueue(SetAttribute(newElement, name, optionalValue.get.toString))
+          case value => patchQueue.enqueue(SetAttribute(newElement, name, value.toString))
+        }
       }
     }
   }
@@ -32,9 +34,10 @@ object Diff {
       case (oldComponent: Component, newComponent: Component) => {
         println("reuse Component")
 
+        newComponent.takeChildrenFrom(oldComponent)
+
         if (oldComponent == newComponent) {
-          // take children
-          newComponent.takeChildrenFrom(oldComponent)
+          //?
         }
         else {
           newComponent.parametersChanged()
@@ -52,8 +55,6 @@ object Diff {
   }
 
   def insertOrAppendNew(path: String, parent: Element, node: Node, sibbling: Option[Node], patchQueue: PatchQueue) = {
-    node.path = path
-
     node match {
       case element: Element => {
         patchQueue.enqueue(CreateNewChild(parent, element, sibbling))
@@ -83,6 +84,7 @@ object Diff {
     val newIterator = newList.iterate()
 
     while (!(newIterator.done && oldIterator.done)) {
+      newIterator.currentItem().path = path
 
       println("comparing old(" + oldIterator.currentKey + ") with new(" + newIterator.currentKey + ")")
 
@@ -95,7 +97,7 @@ object Diff {
         newIterator.continue()
       }
       // insert new node
-      if (!newIterator.done && oldList.indexOf(newIterator.currentKey()).isEmpty) {
+      else if (!newIterator.done && oldList.indexOf(newIterator.currentKey()).isEmpty) {
         insertOrAppendNew(path, parentElement, newIterator.currentItem, newIterator.lastItem, patchQueue)
         newIterator.continue()
 

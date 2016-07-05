@@ -62,3 +62,19 @@ abstract class Component extends Node {
   def shouldRender() : Boolean = true
 
 }
+
+abstract class StatefullComponent[T <: Product] extends Component {
+  product: Product =>
+
+  var state: T = initialState()
+
+  def setState(newState: T) = {
+    state = newState
+    dirty = true
+  }
+
+  /*
+   * lifecycle-hooks
+   */
+  def initialState(): T
+}

@@ -11,31 +11,36 @@ sealed trait Patch {
 
 case class CreateNewChild(parent: Element, child: Element, sibbling: Option[Node]) extends Patch {
   def apply() = {
-    println("create new Element " + child + " @ " + parent + " before " + sibbling.map(s => s.element))
+    val gap = "  " * (child.path.count(_ == '.'))
+    println(gap + "create new Element " + child + " @ " + parent + " before " + sibbling.map(s => s.element))
   }
 }
 
 case class DeleteChild(parent: Element, child: Element) extends Patch {
   def apply() = {
-    println("delete Element " + child + " @ " + parent)
+    val gap = "  " * (child.path.count(_ == '.'))
+    println(gap + "delete Element " + child + " @ " + parent)
   }
 }
 
 case class RemoveAttribute(element: Element, attribute: String) extends Patch {
   def apply() = {
-    println("  remove Attribute " + attribute + " @ " + element)
+    val gap = "  " * (element.path.count(_ == '.'))
+    println(gap + "  -> remove Attribute " + attribute + " @ " + element)
   }
 }
 
 case class SetAttribute(element: Element, attribute: String, value: String) extends Patch {
   def apply() = {
-    println("  set Attribute " + attribute + "=" + value +  " @ " + element)
+    val gap = "  " * (element.path.count(_ == '.'))
+    println(gap + "  -> set Attribute " + attribute + "=" + value +  " @ " + element)
   }
 }
 
 case class MoveChild(parent: Element, child: Element, sibbling: Option[Node]) extends Patch {
   def apply() = {
-    println("move Element " + child + " @ " + parent + " before " + sibbling.map(s => s.element))
+    val gap = "  " * (child.path.count(_ == '.'))
+    println(gap + "move Element " + child + " @ " + parent + " before " + sibbling.map(s => s.element))
   }
 }
 
