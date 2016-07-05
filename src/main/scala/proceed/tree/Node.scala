@@ -1,8 +1,5 @@
 package proceed.tree
 
-import org.scalajs.dom.raw
-import proceed.events.EventHandler
-
 
 trait Node {
   var path: String = _

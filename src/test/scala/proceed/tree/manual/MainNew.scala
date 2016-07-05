@@ -15,7 +15,7 @@ object MainNew {
       div()(
         div(title=Some("p5")),
         p(title=Some("p3")) as("HalloWelt"),
-        button(title=Some("p7")),
+        if (state.from > 4) button(title=Some("p7")) else div() as "sonst",
         MoreComplexComponent(state.from, state.to ,true)
       )
     }
