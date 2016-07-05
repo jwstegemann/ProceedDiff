@@ -7,6 +7,7 @@ trait ChildMap {
   def indexOf(key: String): Option[(Int, Node)]
   def iterate(): ChildIterator
   def getFirstChild() : Node
+  def getNode(key: String) : Option[Node]
 }
 
 object ChildMap {
@@ -47,6 +48,8 @@ class ChildMapImpl extends mutable.LinkedHashMap[String, (Int, Node)] with Child
     put(node.id, (position, node))
 
   }
+
+  override def getNode(key: String) = get(key).map(_._2)
 
   def indexOf(key: String): Option[(Int, Node)] = {
     get(key)
@@ -89,6 +92,8 @@ object NoChildsMap extends ChildMap {
   def add(position: Int, node: Node) = {
     throw new UnsupportedOperationException
   }
+
+  override def getNode(key: String) = None
 
   override def indexOf(key: String) = None
   override def iterate() = new EmptyChildIterator()

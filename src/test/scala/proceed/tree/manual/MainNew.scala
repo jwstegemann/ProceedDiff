@@ -1,9 +1,10 @@
 package proceed.tree.manual
 
 import proceed.diff.patch.PatchQueue
+import proceed.events.{Click, MouseEvent}
 import proceed.tree.html.{button, div, p}
 import proceed.tree.manual.MainNew.MoreComplexComponent
-import proceed.tree.{Component, Element, Node, StatefullComponent}
+import proceed.tree._
 
 /**
   * Created by tiberius on 10.06.16.
@@ -11,10 +12,17 @@ import proceed.tree.{Component, Element, Node, StatefullComponent}
 object MainNew {
 
   case class SimpleComponent(p1: String, p2: Int) extends StatefullComponent[MyState] {
+
+    def increase(e: MouseEvent) = {
+      setState(state.copy(to = state.to+1))
+    }
+
     override def view(): Element = {
       div()(
         div(title=Some("p5")),
-        p(title=Some("p3")) as("HalloWelt"),
+        p(title=Some("p3"))
+          onClick(increase)
+          as("HalloWelt"),
         if (state.from > 4) button(title=Some("p7")) else div() as "sonst",
         MoreComplexComponent(state.from, state.to ,true)
       )
@@ -47,6 +55,11 @@ object MainNew {
 
     c1.mount("mp")
 
+    println("########################################")
+
+    val mp = c1.parent.asInstanceOf[MountPoint]
+
+    mp.handleEvent("mp.0.HalloWelt",Click)(MouseEvent(1,2,true,true,true,false))
 
 
   }

@@ -1,5 +1,9 @@
 package proceed.tree
 
+import proceed.events.EventType
+
+import scala.annotation.tailrec
+
 
 trait Node {
   var path: String = _
@@ -28,6 +32,20 @@ trait Node {
   def element: Element
 
   override def toString = s"$nodeType($path . $id # ${key.getOrElse()})"
+
+  @tailrec final def handleEvent[A <: EventType](id: Seq[String], eventType: A)(event: eventType.Event): Unit = {
+    id match {
+      case head :: Nil => children.getNode(head) match {
+        case Some(e: Element) => e.handle(eventType)(event)
+        case _ => //TODO: Error Handling
+      }
+      case head :: tail => children.getNode(head) match {
+        case Some(n: Node) => n.handleEvent(tail, eventType)(event)
+        case _ => // TODO: Error Handling
+      }
+    }
+  }
+
 }
 
 object EmptyNode extends Node {
