@@ -1,7 +1,7 @@
 package proceed.tree.manual
 
 import proceed.events.{Click, MouseEvent}
-import proceed.tree.html._
+import proceed.tree.html.{button, div, p}
 import proceed.tree._
 
 /**
@@ -16,13 +16,12 @@ object MainNew {
     }
 
     override def view(): Element = {
+      println(s"rendering SimpleComponent with state.from=${state.from} and state.to=${state.to}")
+
       div()(
-        div(title=Some("p5")),
-        p(title=Some("p3"))
-          onClick(increase)
-          as("HalloWelt"),
-        if (state.from > 4) button(title=Some("p7")) else div() as "sonst",
-        MoreComplexComponent(state.from, state.to ,true)
+        p().on(Click, this)(_.increase(_)).as("dummy"),
+        if (state.to > 4) button(title=Some("p7")) else div() as "sonst",
+        MiddleComponent(state.from, state.to)
       )
     }
 
@@ -32,9 +31,31 @@ object MainNew {
 
   case class MyState(from: Int, to: Int)
 
-  case class MoreComplexComponent(from: Int, to: Int, p3: Boolean) extends Component {
+  case class MiddleComponent(from: Int, to: Int) extends StatefullComponent[MyState] {
 
+    override def initialState() = MyState(from, to)
+
+    def decrease(e: MouseEvent)(x: Int) = {
+      setState(state.copy(to = state.to-1))
+    }
+
+    override def view() = {
+      println(s"rendering MiddleComponent with state.from=${state.from} and state.to=${state.to}")
+
+      div()(
+        p().on(Click, this)(_.decrease(_)(17)).as("dummy"),
+//        p().on(Click, this)((c: MiddleComponent, e: MouseEvent) => setState(state.copy(to = state.to-1))).as("dummy"),
+        MoreComplexComponent(state.from, state.to, true)
+      )
+
+    }
+
+  }
+
+  case class MoreComplexComponent(from: Int, to: Int, p3: Boolean) extends Component {
     override def view(): Element = {
+      println(s"rendering MoreComplexComponent with from=$from and to=$to")
+
       div()(
         for (index <- Range(from, to)) yield (p() as s"p$index")
       )
@@ -49,16 +70,17 @@ object MainNew {
 
     println("########################################")
 
-    c1.setState(MyState(5,7))
-
-    c1.mount("mp")
-
-    println("########################################")
-
     val mp = c1.parent.asInstanceOf[MountPoint]
 
-    mp.handleEvent("mp.0.HalloWelt",Click)(MouseEvent(1,2,true,true,true,false))
+    mp.eventLoop((rq,pq) =>
+      mp.handleEvent("SimpleComponent0" ::"0"::"dummy"::Nil,null,Click)(MouseEvent(1,2,true,true,true,false), rq)
+    )
+    
+    println("########################################")
 
+    mp.eventLoop((rq,pq) =>
+      mp.handleEvent("SimpleComponent0" :: "0" :: "MiddleComponent2" ::"0"::"dummy"::Nil,null,Click)(MouseEvent(1,2,true,true,true,false), rq)
+    )
 
   }
 

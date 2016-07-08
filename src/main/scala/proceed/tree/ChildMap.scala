@@ -28,6 +28,9 @@ trait ChildIterator {
   def lastItem(): Option[Node]
   def currentKey(): String
 
+  //TODO: is it still needed?
+  def replaceCurrentItem(newNode: Node)
+
 }
 
 /**
@@ -41,12 +44,10 @@ class ChildMapImpl extends mutable.LinkedHashMap[String, (Int, Node)] with Child
   def add(position: Int, node: Node): Unit = {
 
     node.id = node.key match {
-      case None => s"${node.nodeType}$position}"
+      case None => s"${node.nodeType}$position"
       case Some(key) => key
     }
-
     put(node.id, (position, node))
-
   }
 
   override def getNode(key: String) = get(key).map(_._2)
@@ -82,6 +83,11 @@ class ChildMapImpl extends mutable.LinkedHashMap[String, (Int, Node)] with Child
 
     def lastItem():Option[Node]  = lastChild.map((child: (String,(Int,Node))) => child._2._2)
 
+    def replaceCurrentItem(newNode: Node) = {
+      ChildMapImpl.this.put(currentKey, (currentPos, newNode))
+      currentChild = (currentKey, (currentPos, newNode))
+    }
+
   }
 
 }
@@ -89,9 +95,7 @@ class ChildMapImpl extends mutable.LinkedHashMap[String, (Int, Node)] with Child
 
 object NoChildsMap extends ChildMap {
 
-  def add(position: Int, node: Node) = {
-    throw new UnsupportedOperationException
-  }
+  override def add(position: Int, node: Node) = throw new UnsupportedOperationException
 
   override def getNode(key: String) = None
 
@@ -103,12 +107,12 @@ object NoChildsMap extends ChildMap {
 
     done = true
 
-    def currentPos(): Int = -1
-    def currentKey(): String = EmptyNode.key.get
-    def lastItem(): Option[Node] = None
-    def currentItem(): Node = EmptyNode
-    def continue(): Unit = {}
-
+    override def currentPos(): Int = -1
+    override def currentKey(): String = EmptyNode.key.get
+    override def lastItem(): Option[Node] = None
+    override def currentItem(): Node = EmptyNode
+    override def continue(): Unit = {}
+    override def replaceCurrentItem(newNode: Node) = throw new UnsupportedOperationException
   }
 
 }

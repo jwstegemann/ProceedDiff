@@ -36,10 +36,7 @@ object Diff {
 
         newComponent.takeChildrenFrom(oldComponent)
 
-        if (oldComponent == newComponent) {
-          //?
-        }
-        else {
+        if (oldComponent != newComponent) {
           newComponent.parametersChanged()
           if (newComponent.shouldRender()) newComponent.render(patchQueue, parent, None)
         }

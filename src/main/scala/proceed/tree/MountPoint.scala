@@ -1,6 +1,7 @@
 package proceed.tree
 
 import org.scalajs.dom
+import proceed.diff.RenderQueue
 import proceed.diff.patch.PatchQueue
 import proceed.events._
 
@@ -20,51 +21,71 @@ case class MountPoint() extends Element {
   override def apply(cs: Seq[Node]): Element with Product = throw new UnsupportedOperationException
   override def apply(): Element = throw new UnsupportedOperationException
 
+  //TODO: error-handling
+  //domRef = Some(dom.document.getElementById(id))
+
   def setEventListener() = {
-    //TODO: implement set event-listener
-  }
+  /*  //TODO: add only needed event handlers
+    domRef.get.addEventListener("click", {
+      (e: dom.Event) => handleNativeEvent(e)
+    }, true)
+    //  domRef.get.addEventListener("keypress", {
+    //    (e: dom.Event) => handleNativeEvent(e)
+    //  }, true)
+    //  domRef.get.addEventListener("change", {
+    //    (e: dom.Event) => handleNativeEvent(e)
+    //  }, true)
+    domRef.get.addEventListener("input", {
+      (e: dom.Event) => handleNativeEvent(e)
+    }, true)
+  */}
+
 
   /*
- * event-handling
- */
+   * event-loop
+   */
 
-  //TODO: take DOM-Eevent and get/create params from there
-  def handleEvent[A <: EventType](targetId: String, eventType: A)(event: eventType.Event): Unit = {
-    val target = targetId.split("\\.").toList //FIXME: better way to split string?
-    if (target.head == id) {
-      children.getFirstChild().handleEvent(target.tail, eventType)(event)
-      // Use RenderQueue, etc.
-      val patchQueue = new PatchQueue
-      children.getFirstChild().asInstanceOf[Component].render(patchQueue, this, None)
-      patchQueue.execute()
+  def eventLoop(innerLoop: (RenderQueue, PatchQueue) => Unit) = {
+    val renderQueue = new RenderQueue()
+    val patchQueue = new PatchQueue()
+
+    innerLoop(renderQueue, patchQueue)
+
+    while (!renderQueue.isEmpty) {
+      val component = renderQueue.dequeue()
+      component.render(patchQueue, component.parent, None)
     }
+
+    patchQueue.execute()
   }
 
-  //FIXME: put in extra-class, join with handleEvent from above
+
   def handleNativeEvent(rawEvent: dom.Event) = {
     rawEvent.stopPropagation()
     rawEvent.preventDefault()
 
-    val targetId = rawEvent.srcElement.getAttribute("id")
+    val source = rawEvent.srcElement.getAttribute("id")
+    val (pathString, target) = source.splitAt(source.lastIndexOf(':'))
+    val path = pathString.split(Array('.',':')).tail
 
-    //debug(s"handling ${rawEvent.`type`} event for $targetId")
-
-    //FIXME: change order
-    (rawEvent, rawEvent.`type`) match {
-      //TODO: create proceed.MouseEvent from dom.MouseEvent
-      case (e: dom.MouseEvent, "click") =>
-        handleEvent(targetId, Click)(
-          MouseEvent(e.clientX.toInt, e.clientY.toInt, e.altKey, e.ctrlKey, e.metaKey, e.shiftKey))
-      case (e: dom.KeyboardEvent, "keypress") =>
-        handleEvent(targetId, Keypress)(
-          KeyboardEvent(e.keyCode, e.altKey, e.ctrlKey, e.metaKey, e.shiftKey))
-      case (e: dom.Event, "change") =>
-        handleEvent(targetId, Change)(
-          TargetEvent(e.srcElement))
-      case (e: dom.Event, "input") =>
-        handleEvent(targetId, Input)(
-          TargetEvent(e.srcElement))
-    }
+    eventLoop((renderQueue: RenderQueue, patchQueue: PatchQueue) =>
+      //FIXME: change order
+      (rawEvent, rawEvent.`type`) match {
+        case (e: dom.MouseEvent, "click") =>
+          handleEvent(path, null, Click)(
+            MouseEvent(e.clientX.toInt, e.clientY.toInt, e.altKey, e.ctrlKey, e.metaKey, e.shiftKey), renderQueue)
+        case (e: dom.KeyboardEvent, "keypress") =>
+          handleEvent(path, null, Keypress)(
+            KeyboardEvent(e.keyCode, e.altKey, e.ctrlKey, e.metaKey, e.shiftKey), renderQueue)
+        case (e: dom.Event, "change") =>
+          handleEvent(path, null, Change)(
+            TargetEvent(e.srcElement), renderQueue)
+        case (e: dom.Event, "input") =>
+          handleEvent(path, null, Input)(
+            TargetEvent(e.srcElement), renderQueue)
+      }
+    )
+    
   }
 }
 

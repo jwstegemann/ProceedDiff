@@ -27,8 +27,9 @@ case class button(accessKey: Option[String] = None,
     "dir" ::
     "className" :: Nil
 
-  def onClick(handler: (Click.Event => Unit)): button = {
+ /* def onClick(handler: (Click.Event => Unit)): button = {
     on(Click)(handler)
     this
   }
+  */
 }
