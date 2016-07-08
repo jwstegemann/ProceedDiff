@@ -1,9 +1,7 @@
 package proceed.tree.manual
 
-import proceed.diff.patch.PatchQueue
 import proceed.events.{Click, MouseEvent}
-import proceed.tree.html.{button, div, p}
-import proceed.tree.manual.MainNew.MoreComplexComponent
+import proceed.tree.html._
 import proceed.tree._
 
 /**
