@@ -45,6 +45,7 @@ object MainNew {
 
       div()(
         p().on(Click, this)(_.decrease(_)).as("dummy"),
+//        p().on(Click, this)((c: MiddleComponent, e: MouseEvent) => setState(state.copy(to = state.to-1))).as("dummy"),
         MoreComplexComponent(state.from, state.to, true)
       )
 
