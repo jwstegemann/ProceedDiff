@@ -3,7 +3,6 @@ package proceed.tree.manual
 import proceed.events.{Click, MouseEvent}
 import proceed.tree.html.{button, div, p}
 import proceed.tree._
-import proceed.events.Click
 
 /**
   * Created by tiberius on 10.06.16.
@@ -36,7 +35,7 @@ object MainNew {
 
     override def initialState() = MyState(from, to)
 
-    def decrease(e: MouseEvent) = {
+    def decrease(e: MouseEvent)(x: Int) = {
       setState(state.copy(to = state.to-1))
     }
 
@@ -44,7 +43,7 @@ object MainNew {
       println(s"rendering MiddleComponent with state.from=${state.from} and state.to=${state.to}")
 
       div()(
-        p().on(Click, this)(_.decrease(_)).as("dummy"),
+        p().on(Click, this)(_.decrease(_)(17)).as("dummy"),
 //        p().on(Click, this)((c: MiddleComponent, e: MouseEvent) => setState(state.copy(to = state.to-1))).as("dummy"),
         MoreComplexComponent(state.from, state.to, true)
       )
@@ -74,13 +73,13 @@ object MainNew {
     val mp = c1.parent.asInstanceOf[MountPoint]
 
     mp.eventLoop((rq,pq) =>
-      mp.handleEvent("SimpleComponent0" :: Nil, ":0.dummy", Click)(MouseEvent(1,2,true,true,true,false), rq)
+      mp.handleEvent("SimpleComponent0" ::"0"::"dummy"::Nil,null,Click)(MouseEvent(1,2,true,true,true,false), rq)
     )
     
     println("########################################")
 
     mp.eventLoop((rq,pq) =>
-      mp.handleEvent("SimpleComponent0" :: "0" :: "MiddleComponent2" :: Nil, ":0.dummy",Click)(MouseEvent(1,2,true,true,true,false), rq)
+      mp.handleEvent("SimpleComponent0" :: "0" :: "MiddleComponent2" ::"0"::"dummy"::Nil,null,Click)(MouseEvent(1,2,true,true,true,false), rq)
     )
 
   }

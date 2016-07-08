@@ -7,7 +7,7 @@ import proceed.events.EventHandler
 /**
   * Created by tiberius on 17.06.16.
   */
-abstract class Component extends Node with EventHandler {
+abstract class Component extends Node {
 
   var dirty = false
   var parent: Element = _

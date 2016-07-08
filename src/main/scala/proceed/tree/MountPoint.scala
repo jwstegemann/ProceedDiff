@@ -72,16 +72,16 @@ case class MountPoint() extends Element {
       //FIXME: change order
       (rawEvent, rawEvent.`type`) match {
         case (e: dom.MouseEvent, "click") =>
-          handleEvent(path, target, Click)(
+          handleEvent(path, null, Click)(
             MouseEvent(e.clientX.toInt, e.clientY.toInt, e.altKey, e.ctrlKey, e.metaKey, e.shiftKey), renderQueue)
         case (e: dom.KeyboardEvent, "keypress") =>
-          handleEvent(path, target, Keypress)(
+          handleEvent(path, null, Keypress)(
             KeyboardEvent(e.keyCode, e.altKey, e.ctrlKey, e.metaKey, e.shiftKey), renderQueue)
         case (e: dom.Event, "change") =>
-          handleEvent(path, target, Change)(
+          handleEvent(path, null, Change)(
             TargetEvent(e.srcElement), renderQueue)
         case (e: dom.Event, "input") =>
-          handleEvent(path, target, Input)(
+          handleEvent(path, null, Input)(
             TargetEvent(e.srcElement), renderQueue)
       }
     )

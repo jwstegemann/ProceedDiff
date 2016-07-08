@@ -34,14 +34,16 @@ trait Node {
 
   override def toString = s"$nodeType($path . $id # ${key.getOrElse()})" // owned by $owner"
 
-  @tailrec final def handleEvent[A <: EventType](path: Seq[String], target: String, eventType: A)(event: eventType.Event, renderQueue: RenderQueue): Unit = {
+  //FIXME: make Option from handlingComponent defaulting to None
+  @tailrec final def handleEvent[A <: EventType](path: Seq[String], handlingComponent: Component, eventType: A)(event: eventType.Event, renderQueue: RenderQueue): Unit = {
     path match {
       case head :: Nil => children.getNode(head) match {
-        case Some(handler: Component) => handler.handle(eventType, target, handler)(event, renderQueue)
+        case Some(handler: EventHandler) => handler.handle(eventType, handlingComponent)(event, renderQueue)
         case _ => //TODO: Error Handling
       }
       case head :: tail => children.getNode(head) match {
-        case Some(n: Node) => n.handleEvent(tail, target, eventType)(event, renderQueue)
+          // define method different on Component and Element to define handling Component
+        case Some(n: Node) => n.handleEvent(tail, if(n.isInstanceOf[Component]) n.asInstanceOf[Component] else handlingComponent, eventType)(event, renderQueue)
         case _ => // TODO: Error Handling
       }
     }

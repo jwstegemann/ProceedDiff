@@ -1,10 +1,10 @@
 package proceed.tree
 
 import org.scalajs.dom.raw
-import proceed.events.{EventHandler, EventListener}
+import proceed.events.{EventHandler}
 
 
-abstract class Element extends Node with EventListener {
+abstract class Element extends Node with EventHandler {
   p: Product =>
 
   val fields: Seq[String]
