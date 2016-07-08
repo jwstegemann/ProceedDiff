@@ -2,22 +2,26 @@ package proceed.tree
 
 import proceed.diff.Diff
 import proceed.diff.patch.PatchQueue
+import proceed.events.EventHandler
 
 /**
   * Created by tiberius on 17.06.16.
   */
-abstract class Component extends Node {
+abstract class Component extends Node with EventHandler {
 
   var dirty = false
   var parent: Element = _
+  implicit val self: Component = this // is used by all apply-calls to transfer owner
 
   def view(): Element
 
   final def render(patchQueue: PatchQueue, parentElement: Element, sibling: Option[Element] ): Unit = {
+//    implicit val owner = this
     val child = view()
     child.key = Some("0")
     val newChildren = ChildMap(child)
-    Diff.diff(children, newChildren, path, parentElement, patchQueue)
+    //FIXME: use RenderQueue
+    Diff.diff(children, newChildren, s"$path.$id", parentElement, patchQueue)
     children = newChildren
   }
 
@@ -48,7 +52,7 @@ abstract class Component extends Node {
   def unmount(): Unit = {
     willUnmount()
     val patchQueue = new PatchQueue()
-    Diff.diff(children, NoChildsMap, path, parent.element, patchQueue)
+    Diff.diff(children, NoChildsMap, s"$path.$id", parent.element, patchQueue)
     patchQueue.execute()
   }
 

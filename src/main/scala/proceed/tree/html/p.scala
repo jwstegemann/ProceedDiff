@@ -1,7 +1,7 @@
 package proceed.tree.html
 
 import proceed.events.Click
-import proceed.tree.Element
+import proceed.tree.{Component, Element}
 
 case class p(align: Option[String] = None,
                      title: Option[String] = None,
@@ -15,10 +15,10 @@ case class p(align: Option[String] = None,
     "dir" ::
     "className" :: Nil
 
-  def onClick(handler: (Click.Event => Unit)): p = {
+/*  def onClick[E <: Component](handler: (E, Click.Event => Unit))(implicit owner: E): p = {
     on(Click)(handler)
     this
-  }
+  }*/
 
 }
 

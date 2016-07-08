@@ -1,6 +1,7 @@
 package proceed.tree
 
-import proceed.events.EventType
+import proceed.diff.RenderQueue
+import proceed.events.{EventHandler, EventType}
 
 import scala.annotation.tailrec
 
@@ -31,16 +32,16 @@ trait Node {
 
   def element: Element
 
-  override def toString = s"$nodeType($path . $id # ${key.getOrElse()})"
+  override def toString = s"$nodeType($path . $id # ${key.getOrElse()})" // owned by $owner"
 
-  @tailrec final def handleEvent[A <: EventType](id: Seq[String], eventType: A)(event: eventType.Event): Unit = {
-    id match {
+  @tailrec final def handleEvent[A <: EventType](path: Seq[String], target: String, eventType: A)(event: eventType.Event, renderQueue: RenderQueue): Unit = {
+    path match {
       case head :: Nil => children.getNode(head) match {
-        case Some(e: Element) => e.handle(eventType)(event)
+        case Some(handler: Component) => handler.handle(eventType, target, handler)(event, renderQueue)
         case _ => //TODO: Error Handling
       }
       case head :: tail => children.getNode(head) match {
-        case Some(n: Node) => n.handleEvent(tail, eventType)(event)
+        case Some(n: Node) => n.handleEvent(tail, target, eventType)(event, renderQueue)
         case _ => // TODO: Error Handling
       }
     }

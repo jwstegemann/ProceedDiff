@@ -1,6 +1,6 @@
 package proceed.tree.html
 
-import proceed.tree.Element
+import proceed.tree.{Element}
 
 case class div(align: Option[String] = None,
                title: Option[String] = None,

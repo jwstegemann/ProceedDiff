@@ -41,6 +41,7 @@ case class a(accessKey: Option[String] = None,
     "className" :: Nil
 
 
+/*
   def onBlur(handler: (Blur.Event => Unit)): a = {
     on(Blur)(handler)
     this
@@ -50,5 +51,6 @@ case class a(accessKey: Option[String] = None,
     on(Focus)(handler)
     this
   }
+*/
 
 }

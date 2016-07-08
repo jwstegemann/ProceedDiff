@@ -4,8 +4,10 @@ import proceed.tree.html.{div, p}
 import proceed.util.PrettyPrinter
 import utest._
 
+/*
 
 object TreeTests extends TestSuite{
+
   val tests = this {
     'test1 {
 
@@ -25,3 +27,4 @@ object TreeTests extends TestSuite{
     }
   }
 }
+*/

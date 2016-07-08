@@ -1,14 +1,15 @@
 package proceed.tree
 
 import org.scalajs.dom.raw
-import proceed.events.EventHandler
+import proceed.events.{EventHandler, EventListener}
 
 
-abstract class Element extends Node with EventHandler {
+abstract class Element extends Node with EventListener {
   p: Product =>
 
   val fields: Seq[String]
-  var elementDomRef: Option[raw.Element] = None
+  var domRef: Option[raw.Element] = None
+
 
   override def as(name: String): Element = {
     super.as(name)
@@ -20,13 +21,11 @@ abstract class Element extends Node with EventHandler {
     this
   }
 
-  def apply(cs: Seq[Node]) = {
+  def apply(cs: Seq[Node]): Element = {
     children = new ChildMapImpl
-
     cs.zipWithIndex.foreach {
       case (n: Node, i: Int) => children.add(i, n)
     }
-
     this
   }
 
