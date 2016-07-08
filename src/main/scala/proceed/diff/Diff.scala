@@ -81,7 +81,7 @@ object Diff {
     val newIterator = newList.iterate()
 
     while (!(newIterator.done && oldIterator.done)) {
-      newIterator.currentItem().path = path
+      newIterator.currentItem.path = path
 
       println("comparing old(" + oldIterator.currentKey + ") with new(" + newIterator.currentKey + ")")
 
@@ -94,12 +94,12 @@ object Diff {
         newIterator.continue()
       }
       // insert new node
-      else if (!newIterator.done && oldList.indexOf(newIterator.currentKey()).isEmpty) {
+      else if (!newIterator.done && oldList.indexOf(newIterator.currentKey).isEmpty) {
         insertOrAppendNew(path, parentElement, newIterator.currentItem, newIterator.lastItem, patchQueue)
         newIterator.continue()
 
         // delete old nodes that are not needed anymore in the same step
-        if (oldIterator.currentItem().key.isEmpty) {
+        if (oldIterator.currentItem.key.isEmpty) {
           delete(parentElement, oldIterator.currentItem, patchQueue)
           oldIterator.continue()
         }
@@ -107,9 +107,9 @@ object Diff {
       //TODO: is checking für oldIterator here right?
       else if (!oldIterator.done) {
         // move node if possible (key is implicitly present)
-        newList.indexOf(oldIterator.currentKey()) match {
+        newList.indexOf(oldIterator.currentKey) match {
           case Some((pos: Int, node: Node)) => {
-            if (pos <= newIterator.currentPos()) {
+            if (pos <= newIterator.currentPos) {
               move(parentElement, oldIterator.currentItem, newIterator.currentItem, newIterator.lastItem, patchQueue)
               newIterator.continue()
             } else {
