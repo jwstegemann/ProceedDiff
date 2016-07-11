@@ -6,12 +6,7 @@ import proceed.diff.patch.PatchQueue
 import proceed.events._
 
 object MountPoint {
-  def apply(id: String) = {
-    val mp = new MountPoint()
-    mp.id = id
-    mp.setEventListener()
-    mp
-  }
+  def apply(id: String) = new MountPoint().init(id)
 }
 
 case class MountPoint() extends Element {
@@ -21,11 +16,16 @@ case class MountPoint() extends Element {
   override def apply(cs: Seq[Node]): Element with Product = throw new UnsupportedOperationException
   override def apply(): Element = throw new UnsupportedOperationException
 
-  //FIXME: error-handling
-//  domRef = Some(dom.document.getElementById(id))
+  def init(domId: String): MountPoint = {
+    id = domId
+    //FIXME: error-handling
+    domRef = Some(dom.document.getElementById(id))
+    setEventListener()
+    this
+  }
 
   def setEventListener() = {
-  /*  //TODO: add only needed event handlers
+    //TODO: add only needed event handlers
     domRef.get.addEventListener("click", {
       (e: dom.Event) => handleNativeEvent(e)
     }, true)
@@ -38,7 +38,7 @@ case class MountPoint() extends Element {
     domRef.get.addEventListener("input", {
       (e: dom.Event) => handleNativeEvent(e)
     }, true)
-  */}
+  }
 
 
   /*
