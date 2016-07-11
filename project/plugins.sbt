@@ -1,4 +1,4 @@
-logLevel := Level.Warn
+logLevel := Level.Info
 
 resolvers += "spray repo" at "http://repo.spray.io"
 

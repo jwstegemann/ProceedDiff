@@ -10,6 +10,7 @@ sealed trait Patch {
   def apply()
 }
 
+//TODO: make it nicer...
 case class CreateNewChild(parent: Element, child: Element, sibbling: Option[Node]) extends Patch {
   def apply() = {
     val gap = "  " * (child.path.count(_ == '.'))
@@ -18,9 +19,23 @@ case class CreateNewChild(parent: Element, child: Element, sibbling: Option[Node
     val element = document.createElement(child.nodeType)
     element.id = child.id
 
-    parent.elementDomRef match {
-      case Some(e: raw.Element) => e.appendChild(element)
-      case None => document.getElementById(parent.id).appendChild(element)
+    for ((name: String, (value: Option[Any])) <- child.fields.iterator.zip(child.iterator)) {
+      value match {
+        case Some(s: String) => {
+          if(name.equals("className")) element.setAttribute("class", s)
+          else element.setAttribute(name, s)
+        }
+        case Some(i: Int) => element.setAttribute(name, i.toString)
+        case Some(b: Boolean) => element.setAttribute(name, b.toString)
+        case _ =>
+      }
+    }
+
+    (parent.elementDomRef, sibbling) match {
+      case (Some(e: raw.Element), Some(n: Node)) => e.insertBefore(element, n.element.elementDomRef.getOrElse(document.getElementById(n.id)))
+      case (None, Some(n: Node)) => document.getElementById(parent.id).insertBefore(element, n.element.elementDomRef.getOrElse(document.getElementById(n.id)))
+      case (Some(e: raw.Element), None) => e.appendChild(element)
+      case (None, None) => document.getElementById(parent.id).appendChild(element)
       case _ => throw new UnsupportedOperationException("no parent definded for appending")
     }
     child.elementDomRef = Some(element)

@@ -19,11 +19,12 @@ object ProceedApp extends JSApp {
 
     override def view(): Element = {
       div()(
-        div(title = "p5"),
-        p(title = "p3")
+        div(className = "div0") as "div0",
+        button(value = "ClickMe", disabled = false, tabIndex = 100),
+        p(className = "hallo")
           onClick (increase)
           as ("HalloWelt"),
-        if (state.from > 4) button(value = "p7") else div() as "sonst",
+        if (state.from > 4) button() as "p7" else div() as "sonst",
         MoreComplexComponent(state.from, state.to, true)
       )
     }
@@ -37,7 +38,7 @@ object ProceedApp extends JSApp {
   case class MoreComplexComponent(from: Int, to: Int, p3: Boolean) extends Component {
 
     override def view(): Element = {
-      div()(
+      div() (
         for (index <- Range(from, to)) yield (p() as s"p$index")
       )
     }
@@ -48,17 +49,17 @@ object ProceedApp extends JSApp {
     val c1 = SimpleComponent("test", 17)
     c1.mount("content")
 
-    println("########################################")
-
-    c1.setState(MyState(5, 7))
-
-    c1.mount("content")
-
-    println("########################################")
-
-    val mp = c1.parent.asInstanceOf[MountPoint]
-
-    mp.handleEvent("content.0.HalloWelt", Click)(MouseEvent(1, 2, true, true, true, false))
+//    println("########################################")
+//
+//    c1.setState(MyState(5, 7))
+//
+//    c1.mount("content")
+//
+//    println("########################################")
+//
+//    val mp = c1.parent.asInstanceOf[MountPoint]
+//
+//    mp.handleEvent("content.0.HalloWelt", Click)(MouseEvent(1, 2, true, true, true, false))
 
 
   }
