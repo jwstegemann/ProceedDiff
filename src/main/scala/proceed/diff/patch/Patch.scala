@@ -1,6 +1,7 @@
 package proceed.diff.patch
 
 import proceed.tree.{Element, Node}
+import proceed.util.log
 
 import scala.collection.mutable
 
@@ -13,36 +14,37 @@ sealed trait Patch {
 
 case class CreateNewChild(parent: Element, child: Element, sibbling: Option[Node]) extends Patch {
   def execute() = {
+    //TODO: handle TextNode with document.createTextNode here
     val gap = "  " * (child.path.count(_ == '.'))
-    println(gap + "create new Element " + child + " @ " + parent + " before " + sibbling.map(s => s.element))
+    log.debug(gap + "create new Element " + child + " @ " + parent + " before " + sibbling.map(s => s.element))
   }
 }
 
 case class DeleteChild(parent: Element, child: Element) extends Patch {
   def execute() = {
     val gap = "  " * (child.path.count(_ == '.'))
-    println(gap + "delete Element " + child + " @ " + parent)
+    log.debug(gap + "delete Element " + child + " @ " + parent)
   }
 }
 
 case class RemoveAttribute(element: Element, attribute: String) extends Patch {
   def execute() = {
     val gap = "  " * (element.path.count(_ == '.'))
-    println(gap + "  -> remove Attribute " + attribute + " @ " + element)
+    log.debug(gap + "  -> remove Attribute " + attribute + " @ " + element)
   }
 }
 
 case class SetAttribute(element: Element, attribute: String, value: String) extends Patch {
   def execute() = {
     val gap = "  " * (element.path.count(_ == '.'))
-    println(gap + "  -> set Attribute " + attribute + "=" + value +  " @ " + element)
+    log.debug(gap + "  -> set Attribute " + attribute + "=" + value +  " @ " + element)
   }
 }
 
 case class MoveChild(parent: Element, child: Element, sibbling: Option[Node]) extends Patch {
   def execute() = {
     val gap = "  " * (child.path.count(_ == '.'))
-    println(gap + "move Element " + child + " @ " + parent + " before " + sibbling.map(s => s.element))
+    log.debug(gap + "move Element " + child + " @ " + parent + " before " + sibbling.map(s => s.element))
   }
 }
 

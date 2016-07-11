@@ -21,8 +21,8 @@ case class MountPoint() extends Element {
   override def apply(cs: Seq[Node]): Element with Product = throw new UnsupportedOperationException
   override def apply(): Element = throw new UnsupportedOperationException
 
-  //TODO: error-handling
-  //domRef = Some(dom.document.getElementById(id))
+  //FIXME: error-handling
+//  domRef = Some(dom.document.getElementById(id))
 
   def setEventListener() = {
   /*  //TODO: add only needed event handlers

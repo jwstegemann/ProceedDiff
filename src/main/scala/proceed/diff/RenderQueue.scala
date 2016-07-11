@@ -2,6 +2,7 @@ package proceed.diff
 
 import proceed.diff.patch.PatchQueue
 import proceed.tree.{Component, Element}
+import proceed.util.log
 
 import scala.collection.mutable
 
@@ -34,7 +35,6 @@ class RenderQueue extends mutable.PriorityQueue[RenderItem]()(RenderQueue.orderi
 
   def enqueue(elem: RenderItem): PatchQueue = {
     super.enqueue(elem)
-    println(s"enqueing $elem")
     elem.patchQueue
   }
 

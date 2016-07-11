@@ -2,6 +2,7 @@ package proceed.diff
 
 import proceed.diff.patch._
 import proceed.tree._
+import proceed.util.log
 
 object Diff {
 
@@ -22,14 +23,11 @@ object Diff {
   def reuse(parent: Element, oldNode: Node, newNode: Node, patchQueue: PatchQueue, renderQueue: RenderQueue) = {
     (oldNode, newNode) match {
       case (oldElement: Element, newElement: Element) => {
-        println("reuse Element")
         compareAndPatchAttributes(oldElement, newElement, patchQueue)
         // continue comparing children
         diff(oldElement.children, newElement.children, newElement.childrensPath, newElement, patchQueue, renderQueue)
       }
       case (oldComponent: Component, newComponent: Component) => {
-        println("reuse Component")
-
         newComponent.takeChildrenFrom(oldComponent)
 
         (oldComponent, newComponent) match {
@@ -88,8 +86,6 @@ object Diff {
 
     while (!(newIterator.done && oldIterator.done)) {
       newIterator.currentItem.path = path
-
-      println("comparing old(" + oldIterator.currentKey + ") with new(" + newIterator.currentKey + ")")
 
       // reuse if same type at same position
       if (oldIterator.currentKey == newIterator.currentKey) {

@@ -1,8 +1,9 @@
 package proceed.tree.manual
 
 import proceed.events.{Click, MouseEvent}
-import proceed.tree.html.{button, div, p}
+import proceed.tree.html._
 import proceed.tree._
+import proceed.util.log
 
 /**
   * Created by tiberius on 10.06.16.
@@ -19,7 +20,9 @@ object MainNew {
       println(s"rendering SimpleComponent with state.from=${state.from} and state.to=${state.to}")
 
       div()(
-        p().on(Click, this)(_.increase(_)).as("dummy"),
+        p()(
+          "Dies ist ein Test"
+        ).on(Click, this)(_.increase(_)).as("dummy"),
         if (state.to > 4) button(title=Some("p7")) else div() as "sonst",
         MiddleComponent(state.from, state.to)
       )

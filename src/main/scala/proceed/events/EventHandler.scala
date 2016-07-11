@@ -3,6 +3,7 @@ package proceed.events
 import proceed.diff.patch.PatchQueue
 import proceed.diff.{RenderItem, RenderQueue}
 import proceed.tree.{Component, Element, StatefullComponent}
+import proceed.util.log
 
 trait EventHandler {
   self: Element =>
@@ -28,7 +29,7 @@ trait EventHandler {
           }
         }
       }
-      case None => //TODO: output warning
+      case None => log.warn(s"No event handler for event $event was found at ${this.toString}")
     }
   }
 

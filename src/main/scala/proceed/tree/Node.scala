@@ -3,6 +3,7 @@ package proceed.tree
 import proceed.diff.RenderQueue
 import proceed.diff.patch.PatchQueue
 import proceed.events.{EventHandler, EventType}
+import proceed.util.log
 
 import scala.annotation.tailrec
 
@@ -41,13 +42,13 @@ trait Node {
       case head :: Nil => children.getNode(head) match {
         case Some(handler: EventHandler) => {
           if (!handlingComponent.isEmpty) handler.handle(eventType, handlingComponent.get)(event, renderQueue, patchQueue)
-          else {} //TODO: Error Handling
+          else log.error(s"No handling component could be found for event $event at $handler")
         }
-        case _ => //TODO: Error Handling
+        case _ => log.error(s"There is no child with key $head present at $this to handle event $event.")
       }
       case head :: tail => children.getNode(head) match {
         case Some(n: Node) => n.handleEvent(tail, getNewHandlingComponent(handlingComponent), eventType)(event, renderQueue, patchQueue)
-        case _ => // TODO: Error Handling
+        case _ => log.error(s"There is no child with key $head present at $this to delegate event $event to.")
       }
     }
   }
@@ -62,7 +63,3 @@ object EmptyNode extends Node {
   }
 }
 
-/*
-case class TextNode(content: String) extends Node {
-
-}*/

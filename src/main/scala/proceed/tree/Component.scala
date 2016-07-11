@@ -3,6 +3,7 @@ package proceed.tree
 import proceed.diff.{Diff, RenderQueue}
 import proceed.diff.patch.PatchQueue
 import proceed.events.EventHandler
+import proceed.util.log
 
 /**
   * Created by tiberius on 17.06.16.
@@ -54,7 +55,7 @@ abstract class Component extends Node {
     willUnmount()
     parent match {
       case mp: MountPoint => mp.eventLoop((rq, pq) => Diff.diff(children, NoChildsMap, s"$path.$id", parent.element, pq, rq))
-      case _ => //TODO: log error when unmounting not mounted component
+      case _ => log.error(s"Component $this is not mounted and cannot be unmounted therefore.")
     }
   }
 
