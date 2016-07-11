@@ -3,9 +3,6 @@ package proceed.diff
 import proceed.diff.patch._
 import proceed.tree._
 
-/**
-  * Created by tiberius on 10.06.16.
-  */
 object Diff {
 
   // TODO: write macro for this
@@ -22,44 +19,54 @@ object Diff {
   }
 
   // reuse node at the same place (id stays the same)
-  def reuse(parent: Element, oldNode: Node, newNode: Node, patchQueue: PatchQueue) = {
+  def reuse(parent: Element, oldNode: Node, newNode: Node, patchQueue: PatchQueue, renderQueue: RenderQueue) = {
     (oldNode, newNode) match {
       case (oldElement: Element, newElement: Element) => {
         println("reuse Element")
         compareAndPatchAttributes(oldElement, newElement, patchQueue)
         // continue comparing children
-        //TODO: better non-recursive
-        diff(oldElement.children, newElement.children, newElement.childrensPath, newElement, patchQueue)
+        diff(oldElement.children, newElement.children, newElement.childrensPath, newElement, patchQueue, renderQueue)
       }
       case (oldComponent: Component, newComponent: Component) => {
         println("reuse Component")
 
         newComponent.takeChildrenFrom(oldComponent)
 
-        if (oldComponent != newComponent) {
-          newComponent.parametersChanged()
-          if (newComponent.shouldRender()) newComponent.render(patchQueue, parent, None)
+        (oldComponent, newComponent) match {
+          case (oc: StatefullComponent[Product], nc: StatefullComponent[Product]) => {
+            val oldState = oc.state
+            nc.setState(oldState)
+
+            if (oc != nc) {
+              nc.parametersChanged()
+              if (nc.dirty && nc.shouldRender(oldState)) {
+                patchQueue.enqueue(renderQueue.enqueue(RenderItem(nc, parent, None, new PatchQueue)))
+              }
+            }
+          }
+          case (oc, nc) => {
+            if (oc != nc) patchQueue.enqueue(renderQueue.enqueue(RenderItem(nc, parent, None, new PatchQueue)))
+          }
         }
       }
     }
   }
 
   // move node to another place and reuse (ChildMap.key changes)
-  def move(parent: Element, oldNode: Node, newNode: Node, sibbling: Option[Node], patchQueue: PatchQueue) = {
+  def move(parent: Element, oldNode: Node, newNode: Node, sibbling: Option[Node], patchQueue: PatchQueue, renderQueue: RenderQueue) = {
     patchQueue.enqueue(MoveChild(parent, newNode.element, sibbling))
-    //FIXME: this might result an the deletion of the just created node (for components)
-    reuse(parent, oldNode, newNode, patchQueue)
+    reuse(parent, oldNode, newNode, patchQueue, renderQueue)
   }
 
-  def insertOrAppendNew(path: String, parent: Element, node: Node, sibbling: Option[Node], patchQueue: PatchQueue) = {
+  def insertOrAppendNew(path: String, parent: Element, node: Node, sibbling: Option[Node], patchQueue: PatchQueue, renderQueue: RenderQueue) = {
     node match {
       case element: Element => {
         patchQueue.enqueue(CreateNewChild(parent, element, sibbling))
-        diff(NoChildsMap, element.children, element.childrensPath, element, patchQueue)
+        diff(NoChildsMap, element.children, element.childrensPath, element, patchQueue, renderQueue)
       }
       case component: Component => {
         component.parent = parent
-        component.render(patchQueue, parent, sibbling.map(s => s.element))
+        patchQueue.enqueue(renderQueue.enqueue(RenderItem(component, parent, sibbling.map(s => s.element), new PatchQueue)))
       }
     }
   }
@@ -75,7 +82,7 @@ object Diff {
   }
 
   //FIXME: is parent needed here
-  def diff(oldList: ChildMap, newList: ChildMap, path: String, parentElement: Element, patchQueue: PatchQueue) : Unit = {
+  def diff(oldList: ChildMap, newList: ChildMap, path: String, parentElement: Element, patchQueue: PatchQueue, renderQueue: RenderQueue) : Unit = {
 
     val oldIterator = oldList.iterate()
     val newIterator = newList.iterate()
@@ -88,14 +95,14 @@ object Diff {
       // reuse if same type at same position
       if (oldIterator.currentKey == newIterator.currentKey) {
 
-        reuse(parentElement, oldIterator.currentItem, newIterator.currentItem, patchQueue)
+        reuse(parentElement, oldIterator.currentItem, newIterator.currentItem, patchQueue, renderQueue)
 
         oldIterator.continue()
         newIterator.continue()
       }
       // insert new node
       else if (!newIterator.done && oldList.indexOf(newIterator.currentKey).isEmpty) {
-        insertOrAppendNew(path, parentElement, newIterator.currentItem, newIterator.lastItem, patchQueue)
+        insertOrAppendNew(path, parentElement, newIterator.currentItem, newIterator.lastItem, patchQueue, renderQueue)
         newIterator.continue()
 
         // delete old nodes that are not needed anymore in the same step
@@ -110,7 +117,7 @@ object Diff {
         newList.indexOf(oldIterator.currentKey) match {
           case Some((pos: Int, node: Node)) => {
             if (pos <= newIterator.currentPos) {
-              move(parentElement, oldIterator.currentItem, newIterator.currentItem, newIterator.lastItem, patchQueue)
+              move(parentElement, oldIterator.currentItem, newIterator.currentItem, newIterator.lastItem, patchQueue, renderQueue)
               newIterator.continue()
             } else {
               oldIterator.continue()

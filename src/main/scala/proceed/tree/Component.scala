@@ -1,6 +1,6 @@
 package proceed.tree
 
-import proceed.diff.Diff
+import proceed.diff.{Diff, RenderQueue}
 import proceed.diff.patch.PatchQueue
 import proceed.events.EventHandler
 
@@ -15,14 +15,15 @@ abstract class Component extends Node {
 
   def view(): Element
 
-  final def render(patchQueue: PatchQueue, parentElement: Element, sibling: Option[Element] ): Unit = {
+  final def render(patchQueue: PatchQueue, parentElement: Element, sibling: Option[Element], renderQueue: RenderQueue): Unit = {
 //    implicit val owner = this
     val child = view()
     child.key = Some("0")
     val newChildren = ChildMap(child)
-    //FIXME: use RenderQueue
-    Diff.diff(children, newChildren, s"$path.$id", parentElement, patchQueue)
+    //FIXME: first child has always to be reused and never created new (since sibbling is unknown) Warning?
+    Diff.diff(children, newChildren, s"$path.$id", parentElement, patchQueue, renderQueue)
     children = newChildren
+    dirty = false
   }
 
   //TODO: better without casting? generic ChildMap?
@@ -40,9 +41,7 @@ abstract class Component extends Node {
     mp.children = new ChildMapImpl
     mp.children.add(0, this)
 
-    val patchQueue = new PatchQueue()
-    render(patchQueue, mp, None)
-    patchQueue.execute()
+    mp.eventLoop((rq, pq) => render(pq, mp, None, rq))
   }
 
   def mount(domId: String): Unit = {
@@ -51,20 +50,17 @@ abstract class Component extends Node {
 
   def unmount(): Unit = {
     willUnmount()
-    val patchQueue = new PatchQueue()
-    Diff.diff(children, NoChildsMap, s"$path.$id", parent.element, patchQueue)
-    patchQueue.execute()
+    parent match {
+      case mp: MountPoint => mp.eventLoop((rq, pq) => Diff.diff(children, NoChildsMap, s"$path.$id", parent.element, pq, rq))
+      case _ => //TODO: log error when unmounting not mounted component
+    }
   }
 
   /*
    * lifecycle-hooks
    */
   def isRemoved(): Unit = {}
-  def parametersChanged() : Unit = {}
   def willUnmount(): Unit = {}
-  //FIXME: compare state here
-  def shouldRender() : Boolean = true
-
 }
 
 abstract class StatefullComponent[T <: Product] extends Component {
@@ -81,4 +77,7 @@ abstract class StatefullComponent[T <: Product] extends Component {
    * lifecycle-hooks
    */
   def initialState(): T
+  def parametersChanged() : Unit = {}
+  def shouldRender(oldState: T) = (state != oldState) //TODO: deep compare
+
 }

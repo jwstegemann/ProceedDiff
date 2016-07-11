@@ -35,6 +35,11 @@ object MainNew {
 
     override def initialState() = MyState(from, to)
 
+
+    override def parametersChanged() = {
+      setState(initialState())
+    }
+
     def decrease(e: MouseEvent)(x: Int) = {
       setState(state.copy(to = state.to-1))
     }
@@ -73,13 +78,13 @@ object MainNew {
     val mp = c1.parent.asInstanceOf[MountPoint]
 
     mp.eventLoop((rq,pq) =>
-      mp.handleEvent("SimpleComponent0" ::"0"::"dummy"::Nil,null,Click)(MouseEvent(1,2,true,true,true,false), rq)
+      mp.handleEvent("SimpleComponent0" ::"0"::"dummy"::Nil,null,Click)(MouseEvent(1,2,true,true,true,false), rq, pq)
     )
     
     println("########################################")
 
     mp.eventLoop((rq,pq) =>
-      mp.handleEvent("SimpleComponent0" :: "0" :: "MiddleComponent2" ::"0"::"dummy"::Nil,null,Click)(MouseEvent(1,2,true,true,true,false), rq)
+      mp.handleEvent("SimpleComponent0" :: "0" :: "MiddleComponent2" ::"0"::"dummy"::Nil,null,Click)(MouseEvent(1,2,true,true,true,false), rq, pq)
     )
 
   }

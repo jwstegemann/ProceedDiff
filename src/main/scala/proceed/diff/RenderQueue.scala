@@ -1,6 +1,7 @@
 package proceed.diff
 
-import proceed.tree.Component
+import proceed.diff.patch.PatchQueue
+import proceed.tree.{Component, Element}
 
 import scala.collection.mutable
 
@@ -9,20 +10,36 @@ import scala.collection.mutable
   */
 
 
+case class RenderItem(component: Component, parent: Element, sibbling: Option[Element], patchQueue: PatchQueue) {
+  lazy val depth = component.path.count(_ == '.')
+
+  def render(queue: RenderQueue) = {
+    component.render(patchQueue, parent, sibbling, queue)
+  }
+}
+
 object RenderQueue {
 
-  implicit val ordering = new Ordering[Component] {
-    override def compare(x: Component, y: Component): Int = {
-      x.path.count(_ == '.').compare(y.path.count(_ == '.'))
+  implicit val ordering = new Ordering[RenderItem] {
+    override def compare(x: RenderItem, y: RenderItem): Int = {
+      x.depth.compare(y.depth)
     }
   }
 
 }
 
-class RenderQueue extends mutable.PriorityQueue[Component]()(RenderQueue.ordering) {
+class RenderQueue extends mutable.PriorityQueue[RenderItem]()(RenderQueue.ordering) {
 
-  def enqueue(elem: Component): Unit = {
-    println(s"enqueing $elem")
+  implicit val queue = this
+
+  def enqueue(elem: RenderItem): PatchQueue = {
     super.enqueue(elem)
+    println(s"enqueing $elem")
+    elem.patchQueue
   }
+
+  def renderNext() = {
+    dequeue().render(this)
+  }
+
 }

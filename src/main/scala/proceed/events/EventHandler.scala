@@ -1,20 +1,31 @@
 package proceed.events
 
-import proceed.diff.RenderQueue
-import proceed.tree.{Component, Element}
+import proceed.diff.patch.PatchQueue
+import proceed.diff.{RenderItem, RenderQueue}
+import proceed.tree.{Component, Element, StatefullComponent}
 
 trait EventHandler {
   self: Element =>
 
   private val handlers = new scala.collection.mutable.HashMap[EventType, Any]()
 
-  def handle[T <: EventType, E <: Component](t: T, on: E)(event: t.Event, renderQueue: RenderQueue): Unit = {
+  def handle[T <: EventType, E <: Component](t: T, on: E)(event: t.Event, renderQueue: RenderQueue, patchQueue: PatchQueue): Unit = {
     val opt: Option[(E, t.Event) => Unit] = handlers.get(t).asInstanceOf[Option[(E, t.Event) => Unit]]
 
     opt match {
       case Some(handler) => {
-        handler(on, event)
-        if (on.dirty) renderQueue.enqueue(on)
+        on match {
+          case sc: StatefullComponent[Product] => {
+            val oldState = sc.state
+            handler(on, event)
+            if (sc.dirty && sc.shouldRender(oldState)) {
+              renderQueue.enqueue(RenderItem(sc, sc.parent, None, patchQueue))
+            }
+          }
+          case c => {
+            handler(on, event)
+          }
+        }
       }
       case None => //TODO: output warning
     }
