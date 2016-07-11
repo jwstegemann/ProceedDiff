@@ -29,6 +29,8 @@ abstract class Component extends Node {
   //TODO: better without casting? generic ChildMap?
   override def element: Element = children.getFirstChild().asInstanceOf[Element]
 
+  override def getNewHandlingComponent(c: Option[Component]) = Some(this)
+
   def takeChildrenFrom(other: Component) = {
     this.children = other.children
   }

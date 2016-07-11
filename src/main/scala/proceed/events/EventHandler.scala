@@ -10,6 +10,7 @@ trait EventHandler {
   private val handlers = new scala.collection.mutable.HashMap[EventType, Any]()
 
   def handle[T <: EventType, E <: Component](t: T, on: E)(event: t.Event, renderQueue: RenderQueue, patchQueue: PatchQueue): Unit = {
+
     val opt: Option[(E, t.Event) => Unit] = handlers.get(t).asInstanceOf[Option[(E, t.Event) => Unit]]
 
     opt match {

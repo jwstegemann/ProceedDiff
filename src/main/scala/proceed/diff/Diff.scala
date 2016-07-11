@@ -81,7 +81,6 @@ object Diff {
     }
   }
 
-  //FIXME: is parent needed here
   def diff(oldList: ChildMap, newList: ChildMap, path: String, parentElement: Element, patchQueue: PatchQueue, renderQueue: RenderQueue) : Unit = {
 
     val oldIterator = oldList.iterate()

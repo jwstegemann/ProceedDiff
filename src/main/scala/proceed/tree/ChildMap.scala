@@ -37,7 +37,6 @@ class ChildMapImpl extends mutable.LinkedHashMap[String, (Int, Node)] with Child
 
   override def getFirstChild(): Node = firstEntry.value._2
 
-  //FIXME: keep track of position in Iterator
   def add(position: Int, node: Node): Unit = {
 
     node.id = node.key match {
