@@ -23,6 +23,7 @@ object Diff {
   def reuse(parent: Element, oldNode: Node, newNode: Node, patchQueue: PatchQueue, renderQueue: RenderQueue) = {
     (oldNode, newNode) match {
       case (oldElement: Element, newElement: Element) => {
+        newElement.domRef = oldElement.domRef
         compareAndPatchAttributes(oldElement, newElement, patchQueue)
         // continue comparing children
         diff(oldElement.children, newElement.children, newElement.childrensPath, newElement, patchQueue, renderQueue)

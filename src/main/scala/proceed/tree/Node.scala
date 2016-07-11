@@ -50,6 +50,7 @@ trait Node {
         case Some(n: Node) => n.handleEvent(tail, getNewHandlingComponent(handlingComponent), eventType)(event, renderQueue, patchQueue)
         case _ => log.error(s"There is no child with key $head present at $this to delegate event $event to.")
       }
+      case x => log.debug(x.toString())
     }
   }
 

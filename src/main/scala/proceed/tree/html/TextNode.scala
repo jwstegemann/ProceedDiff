@@ -1,5 +1,6 @@
 package proceed.tree.html
 
+import org.scalajs.dom.raw
 import proceed.tree.{Element, Node}
 
 case class TextNode(content: String) extends Element {

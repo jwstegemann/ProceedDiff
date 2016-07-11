@@ -63,9 +63,7 @@ case class MountPoint() extends Element {
     rawEvent.stopPropagation()
     rawEvent.preventDefault()
 
-    val source = rawEvent.srcElement.getAttribute("id")
-    val (pathString, target) = source.splitAt(source.lastIndexOf(':'))
-    val path = pathString.split(Array('.',':')).tail
+    val path = rawEvent.srcElement.getAttribute("id").split('.').tail.toList
 
     eventLoop((renderQueue: RenderQueue, patchQueue: PatchQueue) =>
       //FIXME: change order
