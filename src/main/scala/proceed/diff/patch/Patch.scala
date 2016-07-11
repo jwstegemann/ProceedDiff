@@ -21,24 +21,25 @@ case class CreateNewChild(parent: Element, child: Element, sibbling: Option[Node
 
     for ((name: String, (value: Option[Any])) <- child.fields.iterator.zip(child.iterator)) {
       value match {
+        case None =>
         case Some(s: String) => {
           if(name.equals("className")) element.setAttribute("class", s)
           else element.setAttribute(name, s)
         }
         case Some(i: Int) => element.setAttribute(name, i.toString)
         case Some(b: Boolean) => element.setAttribute(name, b.toString)
-        case _ =>
+        case _ => //TODO produce warning
       }
     }
 
-    (parent.elementDomRef, sibbling) match {
-      case (Some(e: raw.Element), Some(n: Node)) => e.insertBefore(element, n.element.elementDomRef.getOrElse(document.getElementById(n.id)))
-      case (None, Some(n: Node)) => document.getElementById(parent.id).insertBefore(element, n.element.elementDomRef.getOrElse(document.getElementById(n.id)))
+    (parent.domRef, sibbling) match {
+      case (Some(e: raw.Element), Some(n: Node)) => e.insertBefore(element, n.element.domRef.getOrElse(document.getElementById(n.id)))
+      case (None, Some(n: Node)) => document.getElementById(parent.id).insertBefore(element, n.element.domRef.getOrElse(document.getElementById(n.id)))
       case (Some(e: raw.Element), None) => e.appendChild(element)
       case (None, None) => document.getElementById(parent.id).appendChild(element)
-      case _ => throw new UnsupportedOperationException("no parent definded for appending")
+      case _ => //TODO produce warning "no parent definded for appending"
     }
-    child.elementDomRef = Some(element)
+    child.domRef = Some(element)
   }
 }
 
@@ -48,7 +49,7 @@ case class DeleteChild(parent: Element, child: Element) extends Patch {
     val gap = "  " * (child.path.count(_ == '.'))
     println(gap + "delete Element " + child + " @ " + parent)
 
-    child.elementDomRef match {
+    child.domRef match {
       case Some(e: raw.Element) => e.parentNode.removeChild(e)
       case None => {
         val e = document.getElementById(child.id)
@@ -64,7 +65,7 @@ case class RemoveAttribute(element: Element, attribute: String) extends Patch {
     val gap = "  " * (element.path.count(_ == '.'))
     println(gap + "  -> remove Attribute " + attribute + " @ " + element)
 
-    element.elementDomRef match {
+    element.domRef match {
       case Some(e) => e.removeAttribute(attribute)
       case None => document.getElementById(element.id).removeAttribute(attribute)
       case _ => throw new UnsupportedOperationException("no domRef is defined")
@@ -77,7 +78,7 @@ case class SetAttribute(element: Element, attribute: String, value: String) exte
     val gap = "  " * (element.path.count(_ == '.'))
     println(gap + "  -> set Attribute " + attribute + "=" + value +  " @ " + element)
 
-    element.elementDomRef match {
+    element.domRef match {
       case Some(e) => e.setAttribute(attribute, value)
       case None => document.getElementById(element.id).setAttribute(attribute, value)
       case _ => throw new UnsupportedOperationException("no domRef is defined")
@@ -93,12 +94,12 @@ case class MoveChild(parent: Element, child: Element, sibbling: Option[Node]) ex
     val element = document.createElement(child.nodeType)
     element.id = child.id
 
-    parent.elementDomRef match {
+    parent.domRef match {
       case Some(e: raw.Element) => document.createElement(child.nodeType)
       case None => document.getElementById(parent.id).appendChild(element)
       case _ => throw new UnsupportedOperationException("no parent definded for appending")
     }
-    child.elementDomRef = Some(element)
+    child.domRef = Some(element)
   }
 }
 

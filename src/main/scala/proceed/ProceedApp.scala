@@ -2,7 +2,7 @@ package proceed
 
 import proceed.events.{Click, MouseEvent}
 import proceed.tree.html._
-import proceed.tree.{Component, Element, MountPoint, StatefullComponent}
+import proceed.tree.{Component, Element, StatefullComponent}
 
 import scala.scalajs.js.JSApp
 
@@ -13,7 +13,7 @@ object ProceedApp extends JSApp {
 
   case class SimpleComponent(p1: String, p2: Int) extends StatefullComponent[MyState] {
 
-    def increase(e: MouseEvent) = {
+    def increase(e: MouseEvent): Unit = {
       setState(state.copy(to = state.to + 1))
     }
 
@@ -22,9 +22,9 @@ object ProceedApp extends JSApp {
         div(className = "div0") as "div0",
         button(value = "ClickMe", disabled = false, tabIndex = 100),
         p(className = "hallo")
-          onClick (increase)
-          as ("HalloWelt"),
-        if (state.from > 4) button() as "p7" else div() as "sonst",
+          .on(Click, this)(_.increase(_))
+          as "HalloWelt",
+      if (state.from > 4) button() as "p7" else div() as "sonst",
         MoreComplexComponent(state.from, state.to, true)
       )
     }
