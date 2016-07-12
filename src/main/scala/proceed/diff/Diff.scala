@@ -4,6 +4,8 @@ import proceed.diff.patch._
 import proceed.tree._
 import proceed.util.log
 
+import scala.annotation.tailrec
+
 object Diff {
 
   // TODO: write macro for this
@@ -71,13 +73,8 @@ object Diff {
   }
 
   def delete(parent: Element, node: Node, patchQueue: PatchQueue) = {
-    node match {
-      case element: Element => patchQueue.enqueue(DeleteChild(parent, element))
-      case component: Component => {
-        component.isRemoved()
-        patchQueue.enqueue(DeleteChild(parent, component.element))
-      }
-    }
+    patchQueue.enqueue(DeleteChild(parent, node.element))
+    node.traverseComponents(_.remove())
   }
 
   def diff(oldList: ChildMap, newList: ChildMap, path: String, parentElement: Element, patchQueue: PatchQueue, renderQueue: RenderQueue) : Unit = {

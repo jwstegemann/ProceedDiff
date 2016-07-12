@@ -54,6 +54,22 @@ trait Node {
     }
   }
 
+  final def traverseComponents(toDo: Component => Any): Unit = traverseComponents((0,this) :: Nil, toDo)
+
+  @tailrec
+  final private def traverseComponents(nodes: List[(Int,Node)], toDo: Component => Any ): Unit = {
+    nodes match {
+      case (pos, node: Component) :: tail => {
+        toDo(node)
+        traverseComponents(node.children.entries ++ tail, toDo)
+      }
+      case (pos, node: Node) :: tail => {
+        traverseComponents(node.children.entries ++ tail, toDo)
+      }
+      case Nil =>
+    }
+  }
+
 }
 
 object EmptyNode extends Node {

@@ -8,6 +8,7 @@ trait ChildMap {
   def iterate(): ChildIterator
   def getFirstChild() : Node
   def getNode(key: String) : Option[Node]
+  def entries(): List[(Int, Node)]
 }
 
 object ChildMap {
@@ -52,8 +53,9 @@ class ChildMapImpl extends mutable.LinkedHashMap[String, (Int, Node)] with Child
     get(key)
   }
 
-  def iterate() = new ChildIteratorImpl(reversed.iterator)
+  override def entries() = this.values.toList
 
+  def iterate() = new ChildIteratorImpl(reversed.iterator)
 
   class ChildIteratorImpl(val mapIterator: Iterator[(String, (Int, Node))]) extends ChildIterator {
 
@@ -92,6 +94,7 @@ object NoChildsMap extends ChildMap {
   override def indexOf(key: String) = None
   override def iterate() = new EmptyChildIterator()
   override def getFirstChild(): Node = EmptyNode
+  override def entries() = Nil
 
   class EmptyChildIterator extends ChildIterator() {
 

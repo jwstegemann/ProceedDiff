@@ -1,9 +1,12 @@
 package proceed.tree
 
+import java.lang.reflect.MalformedParametersException
+
 import org.scalajs.dom
 import proceed.diff.RenderQueue
 import proceed.diff.patch.PatchQueue
 import proceed.events._
+import proceed.util.log
 
 object MountPoint {
   def apply(id: String) = new MountPoint().init(id)
@@ -19,7 +22,9 @@ case class MountPoint() extends Element {
   def init(domId: String): MountPoint = {
     id = domId
     //FIXME: error-handling
-    domRef = Some(Left(dom.document.getElementById(id)))
+    val temp = dom.document.getElementById(id)
+    if (temp == null) throw new RuntimeException(s"There is no element with id $domId to serve as MountPoint")
+    domRef = Some(Left(temp))
     setEventListener()
     this
   }
@@ -41,6 +46,7 @@ case class MountPoint() extends Element {
           (e: dom.Event) => handleNativeEvent(e)
         }, true)
       }
+      case _ => log.debug(s"MountPoint $this is not available to register event-listeners.")
     }
   }
 

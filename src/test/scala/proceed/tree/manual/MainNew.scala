@@ -1,9 +1,9 @@
 package proceed.tree.manual
 
+import proceed.diff.Diff
 import proceed.events.{Click, MouseEvent}
 import proceed.tree.html._
 import proceed.tree._
-import proceed.util.log
 
 /**
   * Created by tiberius on 10.06.16.

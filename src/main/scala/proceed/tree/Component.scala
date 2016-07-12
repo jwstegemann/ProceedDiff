@@ -59,9 +59,12 @@ abstract class Component extends Node {
     }
   }
 
+  def remove(): Unit = {}
+
   /*
    * lifecycle-hooks
    */
+
   def isRemoved(): Unit = {}
   def willUnmount(): Unit = {}
 }
@@ -76,9 +79,15 @@ abstract class StatefullComponent[T <: Product] extends Component {
     dirty = true
   }
 
+  override def remove(): Unit = {
+    //FIXME: deregister component
+  }
+
+
   /*
    * lifecycle-hooks
    */
+
   def initialState(): T
   def parametersChanged() : Unit = {}
   def shouldRender(oldState: T) = (state != oldState) //TODO: deep compare

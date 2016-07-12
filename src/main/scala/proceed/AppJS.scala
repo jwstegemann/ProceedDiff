@@ -11,6 +11,7 @@ case class SimpleComponent(p1: String, p2: Int) extends StatefullComponent[MySta
 
   def increase(e: MouseEvent) = {
     setState(state.copy(to = state.to+1))
+    this.traverseComponents(c => println("found " + c))
   }
 
   override def view(): Element = {

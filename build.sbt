@@ -16,8 +16,3 @@ libraryDependencies ++= Seq(
 
 testFrameworks += new TestFramework("utest.runner.Framework")
 
-workbenchSettings
-
-bootSnippet := "proceed.ProceedApp().main();"
-
-refreshBrowsers <<= refreshBrowsers.triggeredBy(fastOptJS in Compile)
