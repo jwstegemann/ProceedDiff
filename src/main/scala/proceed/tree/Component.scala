@@ -1,5 +1,6 @@
 package proceed.tree
 
+import proceed.actions.MessageBroker
 import proceed.diff.{Diff, RenderQueue}
 import proceed.diff.patch.PatchQueue
 import proceed.events.EventHandler
@@ -82,6 +83,8 @@ abstract class StatefullComponent[T <: Product] extends Component {
   override def remove(): Unit = {
     //FIXME: deregister component
   }
+
+  val messageBroker = new MessageBroker[this.type]
 
 
   /*
