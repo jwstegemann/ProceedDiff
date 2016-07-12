@@ -8,7 +8,7 @@ abstract class Element extends Node with EventHandler {
   p: Product =>
 
   val fields: Seq[String]
-  var domRef: Option[raw.Node] = None
+  var domRef: Option[Either[raw.Element, raw.Text]] = None
 
 
   override def as(name: String): Element = {

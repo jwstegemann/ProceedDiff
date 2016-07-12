@@ -19,25 +19,29 @@ case class MountPoint() extends Element {
   def init(domId: String): MountPoint = {
     id = domId
     //FIXME: error-handling
-    domRef = Some(dom.document.getElementById(id))
+    domRef = Some(Left(dom.document.getElementById(id)))
     setEventListener()
     this
   }
 
   def setEventListener() = {
-    //TODO: add only needed event handlers
-    domRef.get.addEventListener("click", {
-      (e: dom.Event) => handleNativeEvent(e)
-    }, true)
-    //  domRef.get.addEventListener("keypress", {
-    //    (e: dom.Event) => handleNativeEvent(e)
-    //  }, true)
-    //  domRef.get.addEventListener("change", {
-    //    (e: dom.Event) => handleNativeEvent(e)
-    //  }, true)
-    domRef.get.addEventListener("input", {
-      (e: dom.Event) => handleNativeEvent(e)
-    }, true)
+    domRef match {
+      case (Some(Left(domElementRef))) => {
+        //TODO: add only needed event handlers
+        domElementRef.addEventListener("click", {
+          (e: dom.Event) => handleNativeEvent(e)
+        }, true)
+        //  domElementRef.addEventListener("keypress", {
+        //    (e: dom.Event) => handleNativeEvent(e)
+        //  }, true)
+        //  domElementRef.addEventListener("change", {
+        //    (e: dom.Event) => handleNativeEvent(e)
+        //  }, true)
+        domElementRef.addEventListener("input", {
+          (e: dom.Event) => handleNativeEvent(e)
+        }, true)
+      }
+    }
   }
 
 
