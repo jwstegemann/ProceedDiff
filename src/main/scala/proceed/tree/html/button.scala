@@ -1,7 +1,7 @@
 package proceed.tree.html
 
 import proceed.tree.Element
-import proceed.util.{ClassName, NilClass}
+import proceed.util.ClassName
 
 case class button(accessKey: Option[String] = None,
                   disabled: Option[Boolean] = None,
@@ -12,7 +12,7 @@ case class button(accessKey: Option[String] = None,
                   lang: Option[String] = None,
                   dir: Option[String] = None,
                   typeName: Option[String] = None,
-                  className: ClassName = NilClass) extends Element {
+                  className: ClassName = ClassName.empty) extends Element {
 
 
   override val fields =

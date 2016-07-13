@@ -1,8 +1,7 @@
 package proceed.tree.html
 
-import proceed.events.{Blur, Focus}
 import proceed.tree.Element
-import proceed.util.{ClassName, NilClass}
+import proceed.util.ClassName
 
 case class a(accessKey: Option[String] = None,
              charset: Option[String] = None,
@@ -19,7 +18,7 @@ case class a(accessKey: Option[String] = None,
              title: Option[String] = None,
              lang: Option[String] = None,
              dir: Option[String] = None,
-             className: ClassName = NilClass) extends Element {
+             className: ClassName = ClassName.empty) extends Element {
 
   override val fields =
     "accessKey" ::
