@@ -1,5 +1,6 @@
 package proceed
 
+import proceed.actions.MyStore
 import proceed.events.{Click, MouseEvent}
 import proceed.tree.html._
 import proceed.tree.{Component, Element, StatefullComponent}
@@ -74,8 +75,11 @@ object AppJS extends JSApp {
 
   @scala.scalajs.js.annotation.JSExport
   override def main(): Unit = {
-    val c = SimpleComponent("test",17)
-    c.mount("mp")
+//    val c = SimpleComponent("test",17)
+//    c.mount("mp")
+
+    MyStore.main()
+
   }
 
 }

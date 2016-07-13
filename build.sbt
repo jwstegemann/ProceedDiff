@@ -7,6 +7,7 @@ version := "1.0"
 scalaVersion := "2.11.8"
 
 scalaJSStage in Global := FastOptStage
+jsDependencies += RuntimeDOM
 
 libraryDependencies ++= Seq(
   "com.lihaoyi"   %%  "utest"         % "0.4.3" % "test",

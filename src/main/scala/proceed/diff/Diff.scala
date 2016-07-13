@@ -36,7 +36,8 @@ object Diff {
         (oldComponent, newComponent) match {
           case (oc: StatefullComponent[Product], nc: StatefullComponent[Product]) => {
             val oldState = oc.state
-            nc.setState(oldState)
+            nc.durable = oc.durable
+            nc.durable.transient = nc
 
             if (oc != nc) {
               nc.parametersChanged()
@@ -64,6 +65,11 @@ object Diff {
       case element: Element => {
         patchQueue.enqueue(CreateNewChild(parent, element, sibbling))
         diff(NoChildsMap, element.children, element.childrensPath, element, patchQueue, renderQueue)
+      }
+      case component: StatefullComponent[Product] => {
+        component.parent = parent
+        component.prepare()
+        patchQueue.enqueue(renderQueue.enqueue(RenderItem(component, parent, sibbling.map(s => s.element), new PatchQueue)))
       }
       case component: Component => {
         component.parent = parent

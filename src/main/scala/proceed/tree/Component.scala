@@ -1,9 +1,8 @@
 package proceed.tree
 
-import proceed.actions.MessageBroker
+import proceed.actions.{Publisher, ReRender, Receiver, Subscriber}
 import proceed.diff.{Diff, RenderQueue}
 import proceed.diff.patch.PatchQueue
-import proceed.events.EventHandler
 import proceed.util.log
 
 /**
@@ -61,6 +60,7 @@ abstract class Component extends Node {
   }
 
   def remove(): Unit = {}
+  def prepare(): Unit = {}
 
   /*
    * lifecycle-hooks
@@ -70,22 +70,41 @@ abstract class Component extends Node {
   def willUnmount(): Unit = {}
 }
 
+
+class DurableComponent[E <: Product](var transient: StatefullComponent[E]) extends Subscriber {
+
+  var state: E = transient.initialState()
+
+  override def dispatch = {
+    case x => transient.dispatch(x)
+  }
+}
+
 abstract class StatefullComponent[T <: Product] extends Component {
   product: Product =>
 
-  var state: T = initialState()
+  var durable: DurableComponent[T] = _
 
   def setState(newState: T) = {
-    state = newState
+    durable.state = newState
     dirty = true
   }
 
-  override def remove(): Unit = {
-    //FIXME: deregister component
+  def state() = durable.state
+
+  override def prepare(): Unit = {
+    durable = new DurableComponent[T](this)
+    init()
   }
 
-  val messageBroker = new MessageBroker[this.type]
+  override def remove(): Unit = {
+    durable.unsubscribeAll()
+  }
 
+  def subscribe(publisher: Publisher): Boolean = durable.subscribe(publisher)
+  def unsubscribe(publisher: Publisher): Boolean = durable.unsubscribe(publisher)
+
+  def dispatch: PartialFunction[Product, Unit] = durable.dispatch
 
   /*
    * lifecycle-hooks
@@ -93,6 +112,6 @@ abstract class StatefullComponent[T <: Product] extends Component {
 
   def initialState(): T
   def parametersChanged() : Unit = {}
-  def shouldRender(oldState: T) = (state != oldState) //TODO: deep compare
-
+  def shouldRender(oldState: T) = state != oldState //TODO: deep compare
+  def init(): Unit = {}
 }
