@@ -1,5 +1,6 @@
 package proceed.diff
 
+import proceed.App
 import proceed.diff.patch._
 import proceed.tree._
 import proceed.util.log
@@ -22,32 +23,35 @@ object Diff {
   }
 
   // reuse node at the same place (id stays the same)
-  def reuse(parent: Element, oldNode: Node, newNode: Node, patchQueue: PatchQueue, renderQueue: RenderQueue) = {
+  def reuse(parent: Element, oldNode: Node, newNode: Node, patchQueue: PatchQueue) = {
     (oldNode, newNode) match {
       case (oldElement: Element, newElement: Element) => {
         newElement.domRef = oldElement.domRef
         compareAndPatchAttributes(oldElement, newElement, patchQueue)
         // continue comparing children
-        diff(oldElement.children, newElement.children, newElement.childrensPath, newElement, patchQueue, renderQueue)
+        diff(oldElement.children, newElement.children, newElement.childrensPath, newElement, patchQueue)
       }
       case (oldComponent: Component, newComponent: Component) => {
+        //FIXME: extract into method in Component
         newComponent.takeChildrenFrom(oldComponent)
+        newComponent.durable = oldComponent.durable
+        newComponent.durable.transient = newComponent
 
         (oldComponent, newComponent) match {
           case (oc: StatefullComponent[Product], nc: StatefullComponent[Product]) => {
             val oldState = oc.state
-            nc.durable = oc.durable
-            nc.durable.transient = nc
+            //FIXME: overwrite method created above to do this
+            nc.state = oc.state
 
             if (oc != nc) {
               nc.parametersChanged()
               if (nc.dirty && nc.shouldRender(oldState)) {
-                patchQueue.enqueue(renderQueue.enqueue(RenderItem(nc, parent, None, new PatchQueue)))
+                patchQueue.enqueue(App.renderQueue.enqueue(RenderItem(nc.durable, parent, None, new PatchQueue)))
               }
             }
           }
           case (oc, nc) => {
-            if (oc != nc) patchQueue.enqueue(renderQueue.enqueue(RenderItem(nc, parent, None, new PatchQueue)))
+            if (oc != nc) patchQueue.enqueue(App.renderQueue.enqueue(RenderItem(nc.durable, parent, None, new PatchQueue)))
           }
         }
       }
@@ -55,25 +59,28 @@ object Diff {
   }
 
   // move node to another place and reuse (ChildMap.key changes)
-  def move(parent: Element, oldNode: Node, newNode: Node, sibbling: Option[Node], patchQueue: PatchQueue, renderQueue: RenderQueue) = {
+  def move(parent: Element, oldNode: Node, newNode: Node, sibbling: Option[Node], patchQueue: PatchQueue) = {
     patchQueue.enqueue(MoveChild(parent, newNode.element, sibbling))
-    reuse(parent, oldNode, newNode, patchQueue, renderQueue)
+    reuse(parent, oldNode, newNode, patchQueue)
   }
 
-  def insertOrAppendNew(path: String, parent: Element, node: Node, sibbling: Option[Node], patchQueue: PatchQueue, renderQueue: RenderQueue) = {
+  def insertOrAppendNew(path: String, parent: Element, node: Node, sibbling: Option[Node], patchQueue: PatchQueue) = {
     node match {
       case element: Element => {
         patchQueue.enqueue(CreateNewChild(parent, element, sibbling))
-        diff(NoChildsMap, element.children, element.childrensPath, element, patchQueue, renderQueue)
+        diff(NoChildsMap, element.children, element.childrensPath, element, patchQueue)
       }
+        //FIXME: Difference between Statefull and not here?
       case component: StatefullComponent[Product] => {
         component.parent = parent
         component.prepare()
-        patchQueue.enqueue(renderQueue.enqueue(RenderItem(component, parent, sibbling.map(s => s.element), new PatchQueue)))
+        patchQueue.enqueue(App.renderQueue.enqueue(RenderItem(component.durable, parent, sibbling.map(s => s.element), new PatchQueue)))
       }
       case component: Component => {
         component.parent = parent
-        patchQueue.enqueue(renderQueue.enqueue(RenderItem(component, parent, sibbling.map(s => s.element), new PatchQueue)))
+        component.prepare()
+        //FIXME: Render StatelessComponents directly?
+        patchQueue.enqueue(App.renderQueue.enqueue(RenderItem(component.durable, parent, sibbling.map(s => s.element), new PatchQueue)))
       }
     }
   }
@@ -83,7 +90,7 @@ object Diff {
     node.traverseComponents(_.remove())
   }
 
-  def diff(oldList: ChildMap, newList: ChildMap, path: String, parentElement: Element, patchQueue: PatchQueue, renderQueue: RenderQueue) : Unit = {
+  def diff(oldList: ChildMap, newList: ChildMap, path: String, parentElement: Element, patchQueue: PatchQueue) : Unit = {
 
     val oldIterator = oldList.iterate()
     val newIterator = newList.iterate()
@@ -94,14 +101,14 @@ object Diff {
       // reuse if same type at same position
       if (oldIterator.currentKey == newIterator.currentKey) {
 
-        reuse(parentElement, oldIterator.currentItem, newIterator.currentItem, patchQueue, renderQueue)
+        reuse(parentElement, oldIterator.currentItem, newIterator.currentItem, patchQueue)
 
         oldIterator.continue()
         newIterator.continue()
       }
       // insert new node
       else if (!newIterator.done && oldList.indexOf(newIterator.currentKey).isEmpty) {
-        insertOrAppendNew(path, parentElement, newIterator.currentItem, newIterator.lastItem, patchQueue, renderQueue)
+        insertOrAppendNew(path, parentElement, newIterator.currentItem, newIterator.lastItem, patchQueue)
         newIterator.continue()
 
         // delete old nodes that are not needed anymore in the same step
@@ -116,7 +123,7 @@ object Diff {
         newList.indexOf(oldIterator.currentKey) match {
           case Some((pos: Int, node: Node)) => {
             if (pos <= newIterator.currentPos) {
-              move(parentElement, oldIterator.currentItem, newIterator.currentItem, newIterator.lastItem, patchQueue, renderQueue)
+              move(parentElement, oldIterator.currentItem, newIterator.currentItem, newIterator.lastItem, patchQueue)
               newIterator.continue()
             } else {
               oldIterator.continue()

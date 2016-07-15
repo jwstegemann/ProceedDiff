@@ -1,5 +1,6 @@
 package proceed.tree
 
+import proceed.App
 import proceed.actions.{Publisher, ReRender, Receiver, Subscriber}
 import proceed.diff.{Diff, RenderQueue}
 import proceed.diff.patch.PatchQueue
@@ -12,17 +13,20 @@ abstract class Component extends Node {
 
   var dirty = false
   var parent: Element = _
+
+  var durable: DurableLink = _
+
   implicit val self: Component = this // is used by all apply-calls to transfer owner
 
   def view(): Element
 
-  final def render(patchQueue: PatchQueue, parentElement: Element, sibling: Option[Element], renderQueue: RenderQueue): Unit = {
-//    implicit val owner = this
+  final def render(patchQueue: PatchQueue, parentElement: Element, sibling: Option[Element]): Unit = {
+    //    implicit val owner = this
     val child = view()
     child.key = Some("0")
     val newChildren = ChildMap(child)
     //FIXME: first child has always to be reused and never created new (since sibbling is unknown) Warning?
-    Diff.diff(children, newChildren, s"$path.$id", parentElement, patchQueue, renderQueue)
+    Diff.diff(children, newChildren, s"$path.$id", parentElement, patchQueue)
     children = newChildren
     dirty = false
   }
@@ -36,15 +40,23 @@ abstract class Component extends Node {
     this.children = other.children
   }
 
+  def prepare(): Unit = {
+    log.debug(s"preparing component $this")
+    durable = new DurableLink(this)
+    init()
+  }
+
   def mount(mp: MountPoint): Unit = {
     path = mp.id
     parent = mp
+
+    prepare()
 
     //TODO: create special ChildMap for one Element-child
     mp.children = new ChildMapImpl
     mp.children.add(0, this)
 
-    mp.eventLoop((rq, pq) => render(pq, mp, None, rq))
+    App.eventLoop((pq) => render(pq, mp, None))
   }
 
   def mount(domId: String): Unit = {
@@ -52,59 +64,56 @@ abstract class Component extends Node {
   }
 
   def unmount(): Unit = {
-    willUnmount()
     parent match {
-      case mp: MountPoint => mp.eventLoop((rq, pq) => Diff.diff(children, NoChildsMap, s"$path.$id", parent.element, pq, rq))
+      case mp: MountPoint => App.eventLoop((pq) => Diff.diff(children, NoChildsMap, s"$path.$id", parent.element, pq))
       case _ => log.error(s"Component $this is not mounted and cannot be unmounted therefore.")
     }
   }
 
   def remove(): Unit = {}
-  def prepare(): Unit = {}
+
+  /*
+   * Messaging
+   */
+
+  def dispatch: PartialFunction[Product, Unit] = PartialFunction.empty
 
   /*
    * lifecycle-hooks
    */
 
   def isRemoved(): Unit = {}
-  def willUnmount(): Unit = {}
+  def init(): Unit = {}
 }
 
 
-class DurableComponent[E <: Product](var transient: StatefullComponent[E]) extends Subscriber {
-
-  var state: E = transient.initialState()
+class DurableLink(var transient: Component) extends Subscriber {
 
   override def dispatch = {
     case x => transient.dispatch(x)
   }
+
+  var invalid = false
+  var enqued = false
 }
 
 abstract class StatefullComponent[T <: Product] extends Component {
   product: Product =>
 
-  var durable: DurableComponent[T] = _
+  var state: T = initialState()
 
   def setState(newState: T) = {
-    durable.state = newState
+    this.state = newState
     dirty = true
-  }
-
-  def state() = durable.state
-
-  override def prepare(): Unit = {
-    durable = new DurableComponent[T](this)
-    init()
   }
 
   override def remove(): Unit = {
     durable.unsubscribeAll()
+    durable.invalid = true
   }
 
   def subscribe(publisher: Publisher): Boolean = durable.subscribe(publisher)
   def unsubscribe(publisher: Publisher): Boolean = durable.unsubscribe(publisher)
-
-  def dispatch: PartialFunction[Product, Unit] = durable.dispatch
 
   /*
    * lifecycle-hooks
@@ -113,5 +122,4 @@ abstract class StatefullComponent[T <: Product] extends Component {
   def initialState(): T
   def parametersChanged() : Unit = {}
   def shouldRender(oldState: T) = state != oldState //TODO: deep compare
-  def init(): Unit = {}
 }

@@ -1,6 +1,5 @@
 package proceed
 
-import proceed.actions.MyStore
 import proceed.events.{Click, MouseEvent}
 import proceed.tree.html._
 import proceed.tree.{Component, Element, StatefullComponent}
@@ -12,7 +11,7 @@ case class SimpleComponent(p1: String, p2: Int) extends StatefullComponent[MySta
 
   def increase(e: MouseEvent) = {
     setState(state.copy(to = state.to+1))
-    this.traverseComponents(c => println("found " + c))
+    //this.traverseComponents(c => println("found " + c))
   }
 
   override def view(): Element = {
@@ -75,10 +74,10 @@ object AppJS extends JSApp {
 
   @scala.scalajs.js.annotation.JSExport
   override def main(): Unit = {
-//    val c = SimpleComponent("test",17)
-//    c.mount("mp")
+    val c = SimpleComponent("test",17)
+    c.mount("mp")
 
-    MyStore.main()
+//    MyStore.main()
 
   }
 
