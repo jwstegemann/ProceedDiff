@@ -1,8 +1,8 @@
 package proceed.tree
 
 import proceed.App
-import proceed.actions.{Publisher, ReRender, Receiver, Subscriber}
-import proceed.diff.{Diff, RenderQueue}
+import proceed.actions.{Store, Subscriber}
+import proceed.diff.{Diff, RenderItem}
 import proceed.diff.patch.PatchQueue
 import proceed.util.log
 
@@ -76,8 +76,6 @@ abstract class Component extends Node {
    * Messaging
    */
 
-  def dispatch: PartialFunction[Product, Unit] = PartialFunction.empty
-
   /*
    * lifecycle-hooks
    */
@@ -87,14 +85,16 @@ abstract class Component extends Node {
 }
 
 
+//FIXME: make two different classes for statefull and not
 class DurableLink(var transient: Component) extends Subscriber {
-
-  override def dispatch = {
-    case x => transient.dispatch(x)
-  }
-
   var invalid = false
   var enqued = false
+
+  override def receive(patchQueue: PatchQueue) = {
+    transient.dirty = true
+    log.debug(s"${this.transient} is receiving")
+    App.renderQueue.enqueue(new RenderItem(this, transient.parent, None, patchQueue))
+  }
 }
 
 abstract class StatefullComponent[T <: Product] extends Component {
@@ -112,8 +112,8 @@ abstract class StatefullComponent[T <: Product] extends Component {
     durable.invalid = true
   }
 
-  def subscribe(publisher: Publisher): Boolean = durable.subscribe(publisher)
-  def unsubscribe(publisher: Publisher): Boolean = durable.unsubscribe(publisher)
+  def subscribe(Store: Store): Boolean = durable.subscribe(Store)
+  def unsubscribe(Store: Store): Boolean = durable.unsubscribe(Store)
 
   /*
    * lifecycle-hooks

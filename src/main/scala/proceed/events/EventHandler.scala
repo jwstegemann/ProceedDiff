@@ -13,17 +13,12 @@ trait EventHandler {
 
   def handle[T <: EventType, E <: Component](t: T, on: E)(event: t.Event, patchQueue: PatchQueue): Unit = {
 
-    log.debug(s"handling event $event on $on")
-
     val opt: Option[(E, t.Event) => Unit] = handlers.get(t).asInstanceOf[Option[(E, t.Event) => Unit]]
-
-    log.debug(s"opt=$opt")
 
     opt match {
       case Some(handler) => {
         on match {
           case sc: StatefullComponent[Product] => {
-            log.debug(s"statefull")
             val oldState = sc.state
             handler(on, event)
             if (sc.dirty && sc.shouldRender(oldState)) {
@@ -31,7 +26,6 @@ trait EventHandler {
             }
           }
           case c => {
-            log.debug(s"stateless $c")
             handler(on, event)
           }
         }

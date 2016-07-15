@@ -1,5 +1,6 @@
 package proceed
 
+import proceed.actions.Store
 import proceed.events.{Click, MouseEvent}
 import proceed.tree.html._
 import proceed.tree.{Component, Element, StatefullComponent}
@@ -7,10 +8,30 @@ import proceed.tree.{Component, Element, StatefullComponent}
 import scala.scalajs.js.JSApp
 
 
+object RangeStore extends Store {
+
+  var from: Int = 0
+  var to: Int = 4
+
+  def inc() = {
+    to += 1
+    emit()
+  }
+
+  def dec() = {
+    to -= 1
+    emit()
+  }
+
+}
+
+
+
+
 case class SimpleComponent(p1: String, p2: Int) extends StatefullComponent[MyState] {
 
   def increase(e: MouseEvent) = {
-    setState(state.copy(to = state.to+1))
+    RangeStore.inc()
     //this.traverseComponents(c => println("found " + c))
   }
 
@@ -22,8 +43,12 @@ case class SimpleComponent(p1: String, p2: Int) extends StatefullComponent[MySta
         "increase"
       ).on(Click, this)(_.increase(_)).as("dummy"),
       if (state.to > 4) button(title=Some("p7")) else div() as "sonst",
-      MiddleComponent(state.from, state.to)
+      MiddleComponent(RangeStore.from, RangeStore.to)
     )
+  }
+
+  override def init() = {
+    subscribe(RangeStore)
   }
 
   override def initialState() = MyState(0,4)
@@ -36,13 +61,8 @@ case class MiddleComponent(from: Int, to: Int) extends StatefullComponent[MyStat
 
   override def initialState() = MyState(from, to)
 
-
-  override def parametersChanged() = {
-    setState(initialState())
-  }
-
   def decrease(e: MouseEvent)(x: Int) = {
-    setState(state.copy(to = state.to-1))
+    RangeStore.dec()
   }
 
   override def view() = {
@@ -53,11 +73,10 @@ case class MiddleComponent(from: Int, to: Int) extends StatefullComponent[MyStat
         "decrease"
       ).on(Click, this)(_.decrease(_)(17)).as("dummy"),
       //        p().on(Click, this)((c: MiddleComponent, e: MouseEvent) => setState(state.copy(to = state.to-1))).as("dummy"),
-      MoreComplexComponent(state.from, state.to, true)
+      MoreComplexComponent(from, to, true)
     )
 
   }
-
 }
 
 case class MoreComplexComponent(from: Int, to: Int, p3: Boolean) extends Component {
@@ -65,7 +84,7 @@ case class MoreComplexComponent(from: Int, to: Int, p3: Boolean) extends Compone
     println(s"rendering MoreComplexComponent with from=$from and to=$to")
 
     div()(
-      for (index <- Range(from, to)) yield (p()(s"Eintrag Nr. $index") as s"p$index")
+      for (index <- Range(from, to)) yield p()(s"Eintrag Nr. $index") as s"p$index"
     )
   }
 }
@@ -76,9 +95,6 @@ object AppJS extends JSApp {
   override def main(): Unit = {
     val c = SimpleComponent("test",17)
     c.mount("mp")
-
-//    MyStore.main()
-
   }
 
 }

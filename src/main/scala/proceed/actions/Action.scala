@@ -1,39 +1,20 @@
 package proceed.actions
 
-import proceed.util.log
+import proceed.App
+import proceed.diff.patch.PatchQueue
 
 import scala.collection.mutable
 
-trait Receiver {
-  def dispatch: PartialFunction[Product, Unit]
 
-  def receive(msg: Product) = {
-    dispatch(msg)
-  }
+trait Subscriber {
+  private val publishers: mutable.HashSet[Store] = new mutable.HashSet[Store]()
 
-}
-
-trait LoggingReceiver extends Receiver {
-  override def receive(msg: Product) = {
-    log.debug(s"receiver $this received message '$msg'")
-    super.receive(msg)
-  }
-}
-
-
-trait Store extends Receiver with Publisher{
-
-}
-
-trait Subscriber extends Receiver {
-  private val publishers: mutable.HashSet[Publisher] = new mutable.HashSet[Publisher]()
-
-  def subscribe(publisher: Publisher) = {
+  def subscribe(publisher: Store) = {
     publisher.subscribe(this)
     publishers.add(publisher)
   }
 
-  def unsubscribe(publisher: Publisher) = {
+  def unsubscribe(publisher: Store) = {
     publisher.unsubscribe(this)
     publishers.remove(publisher)
   }
@@ -41,28 +22,31 @@ trait Subscriber extends Receiver {
   def unsubscribeAll() = {
     publishers.foreach(_.unsubscribe(this))
   }
+
+  def receive(patchQueue: PatchQueue)
 }
 
 
-trait Publisher {
+trait Store {
 
-  private val subscribers: mutable.HashSet[Receiver] = new mutable.HashSet[Receiver]()
+  private val subscribers: mutable.HashSet[Subscriber] = new mutable.HashSet[Subscriber]()
 
-  def subscribe(receiver: Receiver) = subscribers.add(receiver)
-  def unsubscribe(receiver: Receiver) = subscribers.remove(receiver)
+  private[proceed] def subscribe(receiver: Subscriber) = subscribers.add(receiver)
+  private[proceed] def unsubscribe(receiver: Subscriber) = subscribers.remove(receiver)
 
-  def emit(msg: Product) = {
-    subscribers.foreach(_.receive(msg))
+  def emit() = {
+    App.eventLoop((pq) => {
+      subscribers.foreach(_.receive(pq))
+    })
   }
 }
-
-case class ReRender()
 
 
 /*
  * Example
  */
 
+/*
 case class Message1(p1: String)
 case class Message2(p2: Int)
 
@@ -78,3 +62,4 @@ object MyStore extends Store with Publisher with LoggingReceiver {
     this.receive(Message1("Hallo Welt2222"))
   }
 }
+*/

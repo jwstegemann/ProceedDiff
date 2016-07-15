@@ -37,16 +37,21 @@ object Diff {
         newComponent.durable = oldComponent.durable
         newComponent.durable.transient = newComponent
 
+        //FIXME: resort Statefull vs. Not
         (oldComponent, newComponent) match {
           case (oc: StatefullComponent[Product], nc: StatefullComponent[Product]) => {
-            val oldState = oc.state
-            //FIXME: overwrite method created above to do this
-            nc.state = oc.state
-
             if (oc != nc) {
+              //TODO: same as for non-statefull
               nc.parametersChanged()
-              if (nc.dirty && nc.shouldRender(oldState)) {
-                patchQueue.enqueue(App.renderQueue.enqueue(RenderItem(nc.durable, parent, None, new PatchQueue)))
+              patchQueue.enqueue(App.renderQueue.enqueue(RenderItem(nc.durable, parent, None, new PatchQueue)))
+            }
+            else {
+              val oldState = oc.state
+              //FIXME: overwrite method created above to do this
+              nc.state = oc.state
+
+              if (nc.dirty || nc.shouldRender(oldState)) {
+                  patchQueue.enqueue(App.renderQueue.enqueue(RenderItem(nc.durable, parent, None, new PatchQueue)))
               }
             }
           }
