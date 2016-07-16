@@ -1,5 +1,7 @@
 package proceed.util
 
+import org.scalajs.dom.console
+
 
 object log {
 
@@ -9,23 +11,26 @@ object log {
   val ERROR = 2
   val FATAL = 1
 
-  var threshold = DEBUG
+  var threshold = INFO
 
   def setThreshold(level: Int) = {
     threshold = level
 
-    debug = if (threshold >= DEBUG) outputMessage _ else doNothing _
-    info = if (threshold >= INFO) outputMessage _ else doNothing _
-    warn = if (threshold >= WARN) outputMessage _ else doNothing _
-    error = if (threshold >= ERROR) outputMessage _ else doNothing _
+    debug = if (threshold >= DEBUG) outputMessage else doNothing
+    info = if (threshold >= INFO) outputInfo else doNothing
+    warn = if (threshold >= WARN) outputWarn else doNothing
+    error = if (threshold >= ERROR) outputError else doNothing
   }
 
   private def doNothing(msg: String) = {}
   private def outputMessage(msg: String) = {println(msg)}
+  private def outputInfo(msg: String) = {console.info(msg)}
+  private def outputWarn(msg: String) = {console.warn(msg)}
+  private def outputError(msg: String) = {console.error(msg)}
 
-  var debug = outputMessage _
-  var info = outputMessage _
-  var warn = outputMessage _
-  var error = outputMessage _
-  var fatal = outputMessage _
+  var debug = doNothing _
+  var info = outputInfo _
+  var warn = outputWarn _
+  var error = outputError _
+  var fatal = outputError _
 }

@@ -4,7 +4,7 @@ import proceed.actions.Store
 import proceed.events.{Click, MouseEvent}
 import proceed.tree.html._
 import proceed.tree.{Component, Element, StatefullComponent}
-import proceed.util.ClassName
+import proceed.util.{ClassName, log}
 
 import scala.scalajs.js.JSApp
 
@@ -37,7 +37,7 @@ case class SimpleComponent(p1: String, p2: Int) extends StatefullComponent[MySta
   }
 
   override def view(): Element = {
-    println(s"rendering SimpleComponent with state.from=${state.from} and state.to=${state.to}")
+    log.info(s"rendering SimpleComponent with state.from=${state.from} and state.to=${state.to}")
 
     div()(
       p()(
@@ -67,7 +67,7 @@ case class MiddleComponent(from: Int, to: Int) extends StatefullComponent[MyStat
   }
 
   override def view() = {
-    println(s"rendering MiddleComponent with state.from=${state.from} and state.to=${state.to}")
+    log.info(s"rendering MiddleComponent with state.from=${state.from} and state.to=${state.to}")
 
     div(className = ClassName(if(state.to > 4) "Test" else "") + (if(state.from < 10) "Test1" else ""))(
       p()(
@@ -82,7 +82,7 @@ case class MiddleComponent(from: Int, to: Int) extends StatefullComponent[MyStat
 
 case class MoreComplexComponent(from: Int, to: Int, p3: Boolean) extends Component {
   override def view(): Element = {
-    println(s"rendering MoreComplexComponent with from=$from and to=$to")
+    log.info(s"rendering MoreComplexComponent with from=$from and to=$to")
 
     div(title = "Test")(
       for (index <- Range(from, to)) yield p()(s"Eintrag Nr. $index") as s"p$index"
