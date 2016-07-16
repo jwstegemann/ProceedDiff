@@ -54,6 +54,7 @@ case class CreateNewChild(parent: Element, child: Element, sibbling: Option[Node
       case textNode: TextNode => textNode.domRef = Some(Right(dom.document.createTextNode(textNode.content)))
       case element: Element => {
         val newDomElement = dom.document.createElement(child.nodeType)
+        newDomElement.id = child.key.getOrElse("")
         newDomElement.setAttribute("data-proceed",child.childrensPath)
         element.domRef = Some(Left(newDomElement))
       }
