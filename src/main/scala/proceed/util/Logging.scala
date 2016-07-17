@@ -11,22 +11,23 @@ object log {
   val ERROR = 2
   val FATAL = 1
 
-  var threshold = INFO
+  var threshold: Int = _
 
   def setThreshold(level: Int) = {
     threshold = level
 
-    debug = if (threshold >= DEBUG) outputMessage else doNothing
+    debug = if (threshold >= DEBUG) outputDebug else doNothing
     info = if (threshold >= INFO) outputInfo else doNothing
     warn = if (threshold >= WARN) outputWarn else doNothing
     error = if (threshold >= ERROR) outputError else doNothing
+    fatal = if (threshold >= FATAL) outputError else doNothing
   }
 
-  private def doNothing(msg: String) = {}
-  private def outputMessage(msg: String) = {println(msg)}
-  private def outputInfo(msg: String) = {console.info(msg)}
-  private def outputWarn(msg: String) = {console.warn(msg)}
-  private def outputError(msg: String) = {console.error(msg)}
+  private def doNothing(msg: => String) = {}
+  private def outputDebug(msg: => String) = console.log(msg)
+  private def outputInfo(msg: => String) = console.info(msg)
+  private def outputWarn(msg: => String) = console.warn(msg)
+  private def outputError(msg: => String) = console.error(msg)
 
   var debug = doNothing _
   var info = outputInfo _
