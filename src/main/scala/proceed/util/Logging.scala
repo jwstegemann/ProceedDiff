@@ -22,11 +22,11 @@ object log {
     error = if (threshold >= ERROR) outputError else doNothing
   }
 
-  private def doNothing(msg: String) = {}
-  private def outputMessage(msg: String) = {println(msg)}
-  private def outputInfo(msg: String) = {console.info(msg)}
-  private def outputWarn(msg: String) = {console.warn(msg)}
-  private def outputError(msg: String) = {console.error(msg)}
+  private def doNothing(msg: => String) = {}
+  private def outputMessage(msg: => String) = {println(msg)}
+  private def outputInfo(msg: => String) = {console.info(msg)}
+  private def outputWarn(msg: => String) = {console.warn(msg)}
+  private def outputError(msg: => String) = {console.error(msg)}
 
   var debug = doNothing _
   var info = outputInfo _
