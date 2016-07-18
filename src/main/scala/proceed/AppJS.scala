@@ -94,6 +94,8 @@ object AppJS extends JSApp {
 
   @scala.scalajs.js.annotation.JSExport
   override def main(): Unit = {
+    //TODO: move this call to App.init
+    log.setThresholdFromUrl()
     val c = SimpleComponent("test",17)
     c.mount("mp")
   }

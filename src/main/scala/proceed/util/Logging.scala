@@ -1,6 +1,7 @@
 package proceed.util
 
 import org.scalajs.dom.console
+import org.scalajs.dom.window.location
 
 
 object log {
@@ -12,6 +13,11 @@ object log {
   val FATAL = 1
 
   var threshold: Int = _
+
+  def setThresholdFromUrl() = {
+    val params = location.search.substring(1)
+    if(params.contains("debug")) setThreshold(DEBUG)
+  }
 
   def setThreshold(level: Int) = {
     threshold = level
