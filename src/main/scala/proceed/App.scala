@@ -7,6 +7,8 @@ import proceed.util.log
 
 object App {
 
+  log.setThresholdFromUrl()
+
   val renderQueue: RenderQueue = new RenderQueue()
 
   /*

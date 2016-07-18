@@ -12,29 +12,19 @@ import scala.collection.mutable
   * @author Jan Weidenhaupt
   *         13.07.2016
   */
-final case class ClassName(list: mutable.HashSet[String]) {
+sealed case class ClassName(private final val list: mutable.HashSet[String]) {
 
   override def toString: String = list.mkString(" ")
 
   lazy val size: Int = list.size
 
-  def +(s: String): ClassName = {
-    list += s
+  def :+(c: ClassName): ClassName = {
+    list ++= c.list
     this
   }
 
-  def ++(s: String*): ClassName = {
-    list ++= s
-    this
-  }
-
-  def -(s: String): ClassName = {
-    list -= s
-    this
-  }
-
-  def --(s: String*): ClassName = {
-    list --= s
+  def :-(c: ClassName): ClassName = {
+    list --= c.list
     this
   }
 
@@ -48,11 +38,20 @@ object ClassName {
   }
 
   def empty: ClassName = {
-    ClassName(mutable.HashSet.empty[String])
+    NilClass
   }
 
   implicit def string2ClassName(s: String): ClassName = {
     ClassName(s)
   }
 }
+
+object c {
+
+  def apply(s: String*): ClassName = {
+    ClassName(mutable.HashSet.empty[String] ++ s.filterNot(_ == "").view)
+  }
+}
+
+object NilClass extends ClassName(mutable.HashSet.empty[String])
 

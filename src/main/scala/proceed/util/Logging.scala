@@ -15,8 +15,8 @@ object log {
   var threshold: Int = _
 
   def setThresholdFromUrl() = {
-    val params = location.search.substring(1)
-    if(params.contains("debug")) setThreshold(DEBUG)
+    val params = location.search
+    if(params.contains("&debug") || params.contains("?debug")) setThreshold(DEBUG)
   }
 
   def setThreshold(level: Int) = {
