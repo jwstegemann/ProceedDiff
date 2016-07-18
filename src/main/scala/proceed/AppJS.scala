@@ -69,7 +69,7 @@ case class MiddleComponent(from: Int, to: Int) extends StatefullComponent[MyStat
   override def view() = {
     log.info(s"rendering MiddleComponent with state.from=${state.from} and state.to=${state.to}")
 
-    div(className = ClassName(if(state.to > 4) "Test" else "") + (if(state.from < 10) "Test1" else ""))(
+    div(className = (if(state.to > 4) "Test" else "") + (if(state.from < 10) "Test1" else ""))(
       p()(
         "decrease"
       ).on(Click, this)(_.decrease(_)(17)).as("dummy"),
