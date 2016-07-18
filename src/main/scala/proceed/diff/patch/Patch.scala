@@ -3,8 +3,8 @@ package proceed.diff.patch
 import org.scalajs.dom
 import org.scalajs.dom.raw
 import proceed.tree.html.TextNode
-import proceed.tree.{Element, Node}
-import proceed.util.{ClassName, log}
+import proceed.tree.{ClassName, Element, Node}
+import proceed.util.log
 
 
 sealed trait Patch {

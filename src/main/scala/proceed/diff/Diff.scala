@@ -3,7 +3,7 @@ package proceed.diff
 import proceed.App
 import proceed.diff.patch._
 import proceed.tree._
-import proceed.util.{ClassName, log}
+import proceed.util.log
 
 import scala.annotation.tailrec
 

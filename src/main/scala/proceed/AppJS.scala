@@ -3,8 +3,8 @@ package proceed
 import proceed.actions.Store
 import proceed.events.{Click, MouseEvent}
 import proceed.tree.html._
-import proceed.tree.{Component, Element, StatefullComponent}
-import proceed.util.{ClassName, NilClass, c, log}
+import proceed.tree._
+import proceed.util.log
 
 import scala.scalajs.js.JSApp
 

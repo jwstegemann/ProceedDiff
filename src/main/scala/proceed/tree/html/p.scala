@@ -1,7 +1,6 @@
 package proceed.tree.html
 
-import proceed.tree.Element
-import proceed.util.ClassName
+import proceed.tree.{ClassName, Element}
 
 case class p(align: Option[String] = None,
                      title: Option[String] = None,
