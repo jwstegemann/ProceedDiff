@@ -3,6 +3,7 @@ backup
 project/project/
 project/target/
 target/
-core/target
-src
-macros/target
+core/target/
+./src
+macros/target/
+

@@ -1,4 +1,4 @@
-package proceed.actions
+package proceed.store
 
 import proceed.App
 import proceed.diff.patch.PatchQueue
@@ -41,25 +41,3 @@ trait Store {
   }
 }
 
-
-/*
- * Example
- */
-
-/*
-case class Message1(p1: String)
-case class Message2(p2: Int)
-
-
-object MyStore extends Store with Publisher with LoggingReceiver {
-
-  override def dispatch = {
-    case msg: Message1 => println("received Message1")
-    case msg: Message2 => println("received Message2")
-  }
-
-  def main() = {
-    this.receive(Message1("Hallo Welt2222"))
-  }
-}
-*/
