@@ -46,7 +46,7 @@ case class MountPoint() extends Element {
     rawEvent.stopPropagation()
     //rawEvent.preventDefault()
 
-    val path = rawEvent.srcElement.getAttribute("id").split('.').tail.toList
+    val path = rawEvent.srcElement.getAttribute("data-proceed").split('.').tail.toList
 
     log.debug(s"handling $rawTypeString-event ${rawEvent} of ${rawEvent.`type`} @ $path")
 

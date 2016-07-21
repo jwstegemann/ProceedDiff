@@ -41,7 +41,7 @@ trait Node {
     path match {
       case head :: Nil => children.getNode(head) match {
         case Some(handler: EventHandler) => {
-          if (!handlingComponent.isEmpty) handler.handle(handlingComponent.get, eventType)(event, patchQueue)
+          if (handlingComponent.isDefined) handler.handle(handlingComponent.get, eventType)(event, patchQueue)
           else log.error(s"No handling component could be found for event $event at $handler")
         }
         case _ => log.error(s"There is no child with key $head present at $this to handle event $event.")

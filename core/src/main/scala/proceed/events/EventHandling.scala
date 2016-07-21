@@ -6,6 +6,7 @@ import proceed.diff.{RenderItem}
 import proceed.tree.{Component, Element, StatefullComponent}
 import proceed.util.log
 import scala.collection.mutable
+import proceed.events.Input
 
 trait EventHandler {
   self: Element =>
@@ -53,4 +54,7 @@ trait EventDelegate {
   c: Component =>
 
   final def on[T <: EventType](t: T)(handler: this.type => (t.Event => Any)) = (t, handler)
+
+  final def onInput = on(Input) _
+
 }
