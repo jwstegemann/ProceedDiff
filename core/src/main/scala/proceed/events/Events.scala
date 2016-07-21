@@ -11,13 +11,9 @@ sealed trait EventType {
   type Event
 }
 
-trait ProceedEvent {
-
-}
-
 case class MouseEvent(mouseX: Int, mouseY: Int,
                       altKey: Boolean, ctrlKey: Boolean,
-                      metaKey: Boolean, shiftKey: Boolean) extends ProceedEvent
+                      metaKey: Boolean, shiftKey: Boolean)
 
 case class KeyboardEvent(which: Int, altKey: Boolean,
                          ctrlKey: Boolean, metaKey: Boolean, shiftKey: Boolean)
