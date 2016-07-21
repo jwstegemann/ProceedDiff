@@ -43,6 +43,16 @@ sealed trait Patch {
     }
   }
 
+  def createAttributes(domElement: raw.Element, element: Element) = {
+    for ((name: String, newValue) <- element.fields.iterator.zip(element.iterator)) {
+      newValue match {
+        case value: Some[_] => domElement.setAttribute(name, value.get.toString)
+        case className: ClassName => if (className.size > 0) domElement.setAttribute("class", className.toString)
+        case None =>
+      }
+    }
+  }
+
   def gap(child: Node) = "  " * child.path.count(_ == '.')
 
 }
@@ -54,9 +64,10 @@ case class CreateNewChild(parent: Element, child: Node, sibbling: Option[Node]) 
     child match {
       case textNode: TextNode => textNode.domRef = Some(dom.document.createTextNode(textNode.content))
       case element: Element => {
-        val newDomElement = dom.document.createElement(child.nodeType)
+        val newDomElement = dom.document.createElement(element.nodeType)
         newDomElement.id = child.key.getOrElse("")
-        newDomElement.setAttribute("data-proceed",child.childrensPath)
+        newDomElement.setAttribute("data-proceed",element.childrensPath)
+        createAttributes(newDomElement, element)
         element.domRef = Some(newDomElement)
       }
     }

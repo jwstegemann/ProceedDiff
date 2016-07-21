@@ -16,14 +16,14 @@ case class button(accessKey: Option[String] = None,
 
   override val fields =
     "accessKey" ::
-    "disabled" ::
-    "name" ::
-    "tabIndex" ::
-    "value" ::
-    "typeName" ::
-    "title" ::
-    "lang" ::
-    "dir" ::
-    "className" :: Nil
+      "disabled" ::
+      "name" ::
+      "tabIndex" ::
+      "value" ::
+      "title" ::
+      "lang" ::
+      "dir" ::
+      "typeName" ::
+      "className" :: Nil
 
 }

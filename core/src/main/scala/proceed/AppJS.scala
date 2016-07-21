@@ -46,17 +46,16 @@ case class SimpleComponent(p1: String, p2: Int) extends StatefullComponent[MySta
   }
 
   override def view(): Element = {
-    log.info(s"rendering SimpleComponent with state.from=${state.from} and state.to=${state.to}")
+    log.info(s"rendering SimpleComponent with state.from=${RangeStore.from} and state.to=${RangeStore.to}")
 
     div()(
-      input(defaultValue = RangeStore.to.toString) ! onInput(_.storeTo),
+      input(value = RangeStore.to.toString) ! onInput(_.storeTo),
       p()(
-        s"Ihre Eingabe lautet: ${state.to}"
+        s"Ihre Eingabe lautet: ${RangeStore.to}"
       ),
-      p()(
+      button(className = "increase")(
         "increase"
-      ).as("dummy") ! on(Click)(_.increase),
-      if (state.to > 4) button(title=Some("p7")) else div() as "xsonst",
+      ) ! on(Click)(_.increase),
       MiddleComponent(RangeStore.from, RangeStore.to)
     )
   }
@@ -75,7 +74,7 @@ case class MiddleComponent(from: Int, to: Int) extends StatefullComponent[MyStat
 
   override def initialState() = MyState(from, to)
 
-  def decrease(x: Int)(e: MouseEvent) = {
+  def decrease(e: MouseEvent) = {
     RangeStore.dec()
   }
 
@@ -83,10 +82,11 @@ case class MiddleComponent(from: Int, to: Int) extends StatefullComponent[MyStat
     log.info(s"rendering cMiddleComponent y with state.from=${state.from} and state.to=${state.to}")
 
     div()(
-      p()(
-        "decrease"
-      ).as("dummy") ! on(Click)(_.decrease(17)),
-      //        p().on(Click, this)((c: MiddleComponent, e: MouseEvent) => setState(state.copy(to = state.to-1))).as("dummy"),
+      if(RangeStore.to > 6) {
+        button(className = "decrease")(
+          "decrease"
+        ) ! on(Click)(_.decrease)
+      } else div(),
       MoreComplexComponent(from, to, true)
     )
 
@@ -97,8 +97,8 @@ case class MoreComplexComponent(from: Int, to: Int, p3: Boolean) extends Compone
   override def view(): Element = {
     println(s"rendering MoreComplexComponent with from=$from and to=$to")
 
-    div()(
-      for (index <- Range(from, to)) yield p()(s"Eintrag Nr. $index") as s"p$index"
+    div(className = "entries")(
+      for (index <- Range(from, to)) yield p(className = s"entry$index")(s"Eintrag Nr. $index") as s"p$index"
     )
   }
 }
