@@ -1,10 +1,11 @@
 package proceed
 
-import proceed.store.Store
+import com.softwaremill.quicklens._
 import proceed.events._
+import proceed.store.Store
 import proceed.tree.html._
 import proceed.tree.{Component, Element, StatefullComponent}
-import com.softwaremill.quicklens._
+import proceed.util.log
 
 import scala.scalajs.js.JSApp
 
@@ -34,13 +35,18 @@ case class SimpleComponent(p1: String, p2: Int) extends StatefullComponent[MySta
   }
 
   def storeTo(e: TextEvent) : Any = {
-    setState(state.modify(_.to).setTo(e.input.value.toInt))
-    RangeStore.to = e.input.value.toInt
+    try {
+      setState(state.modify(_.to).setTo(e.input.value.toInt))
+      RangeStore.to = e.input.value.toInt
+    } catch {
+      case ex: NumberFormatException => log.error(s"the input text must be a number, not '${e.input.value}'");
+    }
+
     //TODO: set(_.to, e.input.value.toInt)
   }
 
   override def view(): Element = {
-    println(s"rendering SimpleComponent with state.from=${state.from} and state.to=${state.to}")
+    log.info(s"rendering SimpleComponent with state.from=${state.from} and state.to=${state.to}")
 
     div()(
       input(defaultValue = RangeStore.to.toString) ! onInput(_.storeTo),
@@ -74,7 +80,7 @@ case class MiddleComponent(from: Int, to: Int) extends StatefullComponent[MyStat
   }
 
   override def view() = {
-    println(s"rendering cMiddleComponent y with state.from=${state.from} and state.to=${state.to}")
+    log.info(s"rendering cMiddleComponent y with state.from=${state.from} and state.to=${state.to}")
 
     div()(
       p()(

@@ -1,14 +1,14 @@
 package proceed.tree
 
 import org.scalajs.dom.raw
-import proceed.events.{EventHandler}
+import proceed.events.EventHandler
 
 
 abstract class Element extends Node with EventHandler {
   p: Product =>
 
   val fields: Seq[String]
-  var domRef: Option[Either[raw.Element, raw.Text]] = None
+  var domRef: Option[raw.Element] = None
 
 
   override def as(name: String): Element = {
@@ -33,7 +33,7 @@ abstract class Element extends Node with EventHandler {
     this
   }
 
-  override def element() = this
+  def node: Element = this
 
   def iterator = p.productIterator
 }

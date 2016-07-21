@@ -1,6 +1,6 @@
 package proceed.tree.html
 
-import proceed.tree.Element
+import proceed.tree.{ClassName, Element, NilClass}
 
 case class input(defaultValue: Option[String] = None,
                  defaultChecked: Option[Boolean] = None,
@@ -22,8 +22,7 @@ case class input(defaultValue: Option[String] = None,
                  title: Option[String] = None,
                  lang: Option[String] = None,
                  dir: Option[String] = None,
-                 className: Option[String] = None) extends Element {
-
+                 className: ClassName = NilClass) extends Element {
 
   override val fields =
     "defaultValue" ::

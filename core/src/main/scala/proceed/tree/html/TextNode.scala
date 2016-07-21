@@ -1,12 +1,13 @@
 package proceed.tree.html
 
 import org.scalajs.dom.raw
-import proceed.tree.{Element, Node}
+import proceed.tree.Node
 
-case class TextNode(content: String) extends Element {
-  override val fields: Seq[String] = "content" :: Nil
+case class TextNode(content: String) extends Node {
 
-  override def apply(c: Node, cs: Node*): Element = throw new UnsupportedOperationException
-  override def apply(cs: Seq[Node]): Element = throw new UnsupportedOperationException
-  override def apply(): Element = throw new UnsupportedOperationException
+  val fields: Seq[String] = "content" :: Nil
+
+  var domRef: Option[raw.Text] = None
+
+  def node: TextNode = this
 }

@@ -63,7 +63,7 @@ object Diff {
 
   // move node to another place and reuse (ChildMap.key changes)
   def move(parent: Element, oldNode: Node, newNode: Node, sibbling: Option[Node], patchQueue: PatchQueue) = {
-    patchQueue.enqueue(MoveChild(parent, newNode.element, sibbling))
+    patchQueue.enqueue(MoveChild(parent, newNode, sibbling))
     reuse(parent, oldNode, newNode, patchQueue)
   }
 
@@ -76,13 +76,14 @@ object Diff {
       case component: Component => {
         component.parent = parent
         component.prepare()
-        patchQueue.enqueue(App.renderQueue.enqueue(RenderItem(component.durable, parent, sibbling.map(s => s.element), new PatchQueue)))
+        patchQueue.enqueue(App.renderQueue.enqueue(RenderItem(component.durable, parent, sibbling, new PatchQueue)))
       }
+      case text: TextNode => patchQueue.enqueue(CreateNewChild(parent, text, sibbling))
     }
   }
 
   def delete(parent: Element, node: Node, patchQueue: PatchQueue) = {
-    patchQueue.enqueue(DeleteChild(parent, node.element))
+    patchQueue.enqueue(DeleteChild(parent, node))
     node.traverseComponents(_.remove())
   }
 

@@ -1,12 +1,13 @@
 package proceed.tree
 
-import scala.language.experimental.macros
 import proceed.App
-import proceed.store.{Store, Subscriber}
-import proceed.diff.{Diff, RenderItem}
 import proceed.diff.patch.PatchQueue
-import proceed.events.{EventDelegate}
+import proceed.diff.{Diff, RenderItem}
+import proceed.events.EventDelegate
+import proceed.store.{Store, Subscriber}
 import proceed.util.log
+
+import scala.language.experimental.macros
 
 /**
   * Created by tiberius on 17.06.16.
@@ -22,7 +23,7 @@ abstract class Component extends Node with EventDelegate {
 
   def view(): Element
 
-  final def render(patchQueue: PatchQueue, parentElement: Element, sibling: Option[Element]): Unit = {
+  final def render(patchQueue: PatchQueue, parentElement: Element, sibling: Option[Node]): Unit = {
     //    implicit val owner = this
     val child = view()
     child.key = Some("0")
@@ -34,7 +35,7 @@ abstract class Component extends Node with EventDelegate {
   }
 
   //TODO: better without casting? generic ChildMap?
-  override def element: Element = children.getFirstChild().asInstanceOf[Element]
+  def node: Element = children.getFirstChild().asInstanceOf[Element]
 
   override def getNewHandlingComponent(c: Option[Component]) = Some(this)
 
@@ -69,7 +70,7 @@ abstract class Component extends Node with EventDelegate {
 
   def unmount(): Unit = {
     parent match {
-      case mp: MountPoint => App.startEventLoop((pq) => Diff.diff(children, NoChildsMap, s"$path.$id", parent.element, pq))
+      case mp: MountPoint => App.startEventLoop((pq) => Diff.diff(children, NoChildsMap, s"$path.$id", parent.node, pq))
       case _ => log.error(s"Component $this is not mounted and cannot be unmounted therefore.")
     }
   }

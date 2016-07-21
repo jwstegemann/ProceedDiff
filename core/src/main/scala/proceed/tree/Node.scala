@@ -1,6 +1,5 @@
 package proceed.tree
 
-import proceed.diff.RenderQueue
 import proceed.diff.patch.PatchQueue
 import proceed.events.{EventHandler, EventType}
 import proceed.util.log
@@ -16,7 +15,7 @@ trait Node {
   lazy val childrensPath = s"$path.$id"
 
   //TODO: write macro for this (and maybe even generate hash)
-  lazy val nodeType: String = this.getClass.getSimpleName()
+  lazy val nodeType: String = this.getClass.getSimpleName
 
   def as(name: String) = {
     this.key = Some(name)
@@ -30,8 +29,6 @@ trait Node {
     as(name)
   }
   */
-
-  def element: Element
 
   override def toString = s"$nodeType($path . $id # ${key.getOrElse()})" // owned by $owner"
 
@@ -74,9 +71,5 @@ trait Node {
 
 object EmptyNode extends Node {
   key = Some("_")
-
-  override def element() = {
-    throw new UnsupportedOperationException
-  }
 }
 

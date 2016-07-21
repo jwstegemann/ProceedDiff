@@ -1,10 +1,7 @@
 package proceed.tree
 
-import java.lang.reflect.MalformedParametersException
-
 import org.scalajs.dom
 import proceed.App
-import proceed.diff.RenderQueue
 import proceed.diff.patch.PatchQueue
 import proceed.events._
 import proceed.util.log
@@ -24,14 +21,14 @@ case class MountPoint() extends Element {
     id = domId
     val temp = dom.document.getElementById(id)
     if (temp == null) throw new RuntimeException(s"There is no element with id $domId to serve as MountPoint")
-    domRef = Some(Left(temp))
+    domRef = Some(temp)
     setEventListener()
     this
   }
 
   def setEventListener() = {
     domRef match {
-      case (Some(Left(domElementRef))) => {
+      case (Some(domElementRef)) => {
         domElementRef.addEventListener("input", handleNativeEvent("input") _, false)
         domElementRef.addEventListener("click", handleNativeEvent("click") _, false)
         domElementRef.addEventListener("keypress", handleNativeEvent("keypress") _, false)
@@ -48,7 +45,7 @@ case class MountPoint() extends Element {
 
     val path = rawEvent.srcElement.getAttribute("data-proceed").split('.').tail.toList
 
-    log.debug(s"handling $rawTypeString-event ${rawEvent} of ${rawEvent.`type`} @ $path")
+    log.debug(s"handling $rawTypeString-event $rawEvent of ${rawEvent.`type`} @ $path")
 
     App.startEventLoop((patchQueue: PatchQueue) =>
       //FIXME: change order
