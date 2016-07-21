@@ -1,13 +1,11 @@
 package proceed.tree
 
-import com.softwaremill.quicklens._
-
 import scala.language.experimental.macros
 import proceed.App
 import proceed.store.{Store, Subscriber}
 import proceed.diff.{Diff, RenderItem}
 import proceed.diff.patch.PatchQueue
-import proceed.events.{EventDelegate, EventType}
+import proceed.events.{EventDelegate}
 import proceed.util.log
 
 /**

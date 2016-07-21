@@ -29,8 +29,6 @@ object RangeStore extends Store {
 
 case class SimpleComponent(p1: String, p2: Int) extends StatefullComponent[MyState] {
 
-  def to[E <: EventType](t: E)(m: (this.type, t.Event) => Any): (this.type, t.Event) => Any = m
-
   def increase(e: MouseEvent) : Any = {
     RangeStore.inc()
   }
