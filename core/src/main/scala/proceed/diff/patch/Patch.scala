@@ -4,7 +4,7 @@ import org.scalajs.dom
 import org.scalajs.dom.raw
 import org.scalajs.dom.raw.Text
 import proceed.tree.html.TextNode
-import proceed.tree.{Element, Node}
+import proceed.tree.{ClassName, Element, Node}
 import proceed.util.log
 
 
@@ -55,7 +55,8 @@ case class CreateNewChild(parent: Element, child: Element, sibbling: Option[Node
       case textNode: TextNode => textNode.domRef = Some(Right(dom.document.createTextNode(textNode.content)))
       case element: Element => {
         val newDomElement = dom.document.createElement(child.nodeType)
-        newDomElement.setAttribute("id",child.childrensPath)
+        newDomElement.id = child.key.getOrElse("")
+        newDomElement.setAttribute("data-proceed",child.childrensPath)
         element.domRef = Some(Left(newDomElement))
       }
     }
@@ -92,6 +93,14 @@ case class SetAttribute(element: Element, attribute: String, value: String) exte
     log.debug(gap(element) + "  -> set Attribute " + attribute + "=" + value +  " @ " + element)
 
     doWithDomElementRef(element, _.setAttribute(attribute, value))
+  }
+}
+
+case class SetClassName(element: Element, className: ClassName) extends Patch {
+  def execute() = {
+    log.debug(gap(element) + "  -> set ClassNames " + className +  " @ " + element)
+
+    doWithDomElementRef(element, _.setAttribute("class", className.toString()))
   }
 }
 

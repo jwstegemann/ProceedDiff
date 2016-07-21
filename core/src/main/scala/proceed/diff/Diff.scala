@@ -14,6 +14,7 @@ object Diff {
         newValue match {
           case None => patchQueue.enqueue(RemoveAttribute(newElement, name))
           case optionalValue: Some[_] => patchQueue.enqueue(SetAttribute(newElement, name, optionalValue.get.toString))
+          case className: ClassName => patchQueue.enqueue(SetClassName(newElement, className))
           case value => patchQueue.enqueue(SetAttribute(newElement, name, value.toString))
         }
       }

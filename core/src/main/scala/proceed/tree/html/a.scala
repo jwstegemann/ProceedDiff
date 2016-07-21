@@ -1,9 +1,6 @@
 package proceed.tree.html
 
-import proceed.events.{Blur, Focus}
-import proceed.tree.Element
-
-//import proceed.{Focus, Blur}
+import proceed.tree.{ClassName, Element}
 
 case class a(accessKey: Option[String] = None,
              charset: Option[String] = None,
@@ -20,7 +17,7 @@ case class a(accessKey: Option[String] = None,
              title: Option[String] = None,
              lang: Option[String] = None,
              dir: Option[String] = None,
-             className: Option[String] = None) extends Element {
+             className: ClassName = ClassName.empty) extends Element {
 
   override val fields =
     "accessKey" ::
@@ -39,18 +36,5 @@ case class a(accessKey: Option[String] = None,
     "lang" ::
     "dir" ::
     "className" :: Nil
-
-
-/*
-  def onBlur(handler: (Blur.Event => Unit)): a = {
-    on(Blur)(handler)
-    this
-  }
-
-  def onFocus(handler: (Focus.Event => Unit)): a = {
-    on(Focus)(handler)
-    this
-  }
-*/
 
 }
