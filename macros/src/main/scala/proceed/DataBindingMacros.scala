@@ -7,7 +7,7 @@ object DataBindingMacros {
 
   def bindImpl[T: c.WeakTypeTag, U: c.WeakTypeTag, E: c.WeakTypeTag]
     (c: blackbox.Context)
-    (eventType: c.Expr[E])(path: c.Expr[T => U]): c.Expr[(E, Any)] = {
+    (eventType: c.Expr[E])(value: c.Expr[E => U], path: c.Expr[T => U]): c.Expr[(E, Any)] = {
 
     import c.universe._
 
@@ -17,8 +17,7 @@ object DataBindingMacros {
     c.Expr[(E, Any)](
       q"""($eventType, (on: StatefullComponent[${symbolOf[T]}]) =>
          (e: Input.Event) => {
-          on.setState($modification.setTo(e.input.value.toInt))
-          println("IM MACROss!!" + $modification + "!!!" + state + "!!!!!!!!!!!!" + e)
+          on.setState($modification.setTo($value(e)))
          })""")
   }
 

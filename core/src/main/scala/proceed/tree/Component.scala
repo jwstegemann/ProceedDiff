@@ -5,7 +5,7 @@ import proceed.{App, DataBindingMacros}
 import proceed.store.{Store, Subscriber}
 import proceed.diff.{Diff, RenderItem}
 import proceed.diff.patch.PatchQueue
-import proceed.events.{EventDelegate, EventType}
+import proceed.events.{EventDelegate, EventType, Input}
 import proceed.util.log
 
 /**
@@ -124,6 +124,6 @@ abstract class StatefullComponent[T <: Product] extends Component {
 trait DataBinding[T <: Product] {
   self: StatefullComponent[T] =>
 
-  def bind[U, E <: EventType](eventType: E)(path: T => U): (E, Any) = macro DataBindingMacros.bindImpl[T,U,E]
+  def bind[U, E <: EventType](eventType: E)(value: eventType.Event => U, path: T => U): (E, Any) = macro DataBindingMacros.bindImpl[T,U,E]
 
 }

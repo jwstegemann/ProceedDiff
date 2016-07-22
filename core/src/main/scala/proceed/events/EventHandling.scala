@@ -55,5 +55,4 @@ trait EventDelegate {
   final def on[T <: EventType](t: T)(handler: this.type => (t.Event => Any)) = (t, handler)
 
   final def onInput = on(Input) _
-
 }
