@@ -1,3 +1,6 @@
+https://travis-ci.com/jwstegemann/ProceedDiff.svg?token=zBsDYAoDLeq7AWeK5fyk&branch=master
+
+
 # Proceed
 
 a scala libary for creating user interfaces in javascript like [React](https://facebook.github.io/react/) build with [Scala.js](http://www.scala-js.org/)
