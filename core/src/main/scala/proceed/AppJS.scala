@@ -3,7 +3,7 @@ package proceed
 import proceed.store.Store
 import proceed.events._
 import proceed.tree.html._
-import proceed.tree.{Component, Element, StatefullComponent}
+import proceed.tree.{Component, DataBinding, Element, StatefullComponent}
 import com.softwaremill.quicklens._
 
 import scala.scalajs.js.JSApp
@@ -27,7 +27,7 @@ object RangeStore extends Store {
 }
 
 
-case class SimpleComponent(p1: String, p2: Int) extends StatefullComponent[MyState] {
+case class SimpleComponent(p1: String, p2: Int) extends StatefullComponent[MyState] with DataBinding[MyState] {
 
   def increase(e: MouseEvent) : Any = {
     RangeStore.inc()
@@ -43,7 +43,7 @@ case class SimpleComponent(p1: String, p2: Int) extends StatefullComponent[MySta
     println(s"rendering SimpleComponent with state.from=${state.from} and state.to=${state.to}")
 
     div()(
-      input(defaultValue = RangeStore.to.toString) ! onInput(_.storeTo),
+      input(defaultValue = RangeStore.to.toString) ! bind(Input)(_.to), // onInput(_.storeTo),
       p()(
         s"Ihre Eingabe lautet: ${state.to}"
       ),
@@ -98,8 +98,6 @@ case class MoreComplexComponent(from: Int, to: Int, p3: Boolean) extends Compone
 }
 
 object AppJS extends JSApp {
-
-  Macros.hello
 
   @scala.scalajs.js.annotation.JSExport
   override def main(): Unit = {

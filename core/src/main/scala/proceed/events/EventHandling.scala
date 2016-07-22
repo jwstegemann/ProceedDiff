@@ -6,7 +6,6 @@ import proceed.diff.{RenderItem}
 import proceed.tree.{Component, Element, StatefullComponent}
 import proceed.util.log
 import scala.collection.mutable
-import proceed.events.Input
 
 trait EventHandler {
   self: Element =>

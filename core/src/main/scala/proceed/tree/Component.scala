@@ -1,11 +1,11 @@
 package proceed.tree
 
 import scala.language.experimental.macros
-import proceed.App
+import proceed.{App, DataBindingMacros}
 import proceed.store.{Store, Subscriber}
 import proceed.diff.{Diff, RenderItem}
 import proceed.diff.patch.PatchQueue
-import proceed.events.{EventDelegate}
+import proceed.events.{EventDelegate, EventType}
 import proceed.util.log
 
 /**
@@ -113,10 +113,17 @@ abstract class StatefullComponent[T <: Product] extends Component {
   }
 
   /*
-   * lifecycle-hooks
+   * lifecycle-hookss
    */
 
   def initialState(): T
   def parametersChanged() : Unit = {}
   def shouldRender(oldState: T) = state != oldState //TODO: deep compare
+}
+
+trait DataBinding[T <: Product] {
+  self: StatefullComponent[T] =>
+
+  def bind[U, E <: EventType](eventType: E)(path: T => U): (E, Any) = macro DataBindingMacros.bindImpl[T,U,E]
+
 }
