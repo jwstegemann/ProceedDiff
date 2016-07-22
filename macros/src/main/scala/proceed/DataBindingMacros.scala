@@ -7,7 +7,7 @@ object DataBindingMacros {
 
   def bindImpl[T: c.WeakTypeTag, U: c.WeakTypeTag, E: c.WeakTypeTag]
     (c: blackbox.Context)
-    (eventType: c.Expr[E])(value: c.Expr[E => U], path: c.Expr[T => U]): c.Expr[(E, Any)] = {
+    (eventType: c.Expr[E])(path: c.Expr[T => U])(value: c.Expr[E => U]): c.Expr[(E, Any)] = {
 
     import c.universe._
 

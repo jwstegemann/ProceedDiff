@@ -28,6 +28,9 @@ object TextEvent {
   def fromEvent(e: dom.Event) = {
     TextEvent(e.target.asInstanceOf[HTMLInputElement])
   }
+
+  implicit val inputStringBinder: (TextEvent => String) = _.input.value
+  implicit val inputIntBinder: (TextEvent => Int) = _.input.value.toInt
 }
 
 

@@ -124,6 +124,6 @@ abstract class StatefullComponent[T <: Product] extends Component {
 trait DataBinding[T <: Product] {
   self: StatefullComponent[T] =>
 
-  def bind[U, E <: EventType](eventType: E)(value: eventType.Event => U, path: T => U): (E, Any) = macro DataBindingMacros.bindImpl[T,U,E]
+  def bind[U, E <: EventType](eventType: E)(path: T => U)(implicit value: eventType.Event => U): (E, Any) = macro DataBindingMacros.bindImpl[T,U,E]
 
 }
