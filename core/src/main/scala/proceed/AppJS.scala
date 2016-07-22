@@ -27,7 +27,7 @@ object RangeStore extends Store {
 }
 
 
-case class SimpleComponent(p1: String, p2: Int) extends StatefullComponent[MyState] with DataBinding[MyState] {
+case class SimpleComponent(p1: String, p2: Int) extends StatefullComponent[MyState] {
 
   def increase(e: MouseEvent) : Any = {
     RangeStore.inc()

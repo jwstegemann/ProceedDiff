@@ -102,7 +102,18 @@ class DurableLink(var transient: Component) extends Subscriber {
   }
 }
 
-abstract class StatefullComponent[T <: Product] extends Component {
+
+trait DataBinding[T <: Product] {
+  self: StatefullComponent[T] =>
+
+  def bind[U, E <: EventType](eventType: E)(path: T => U)(implicit value: eventType.Event => U): (E, Any) = macro DataBindingMacros.bindImpl[T,U,E]
+
+  def update[U](path: T => U, value: U): Unit = macro DataBindingMacros.updateImpl[T,U]
+
+}
+
+
+abstract class StatefullComponent[T <: Product] extends Component with DataBinding[T] {
   product: Product =>
 
   var state: T = initialState()
@@ -121,11 +132,3 @@ abstract class StatefullComponent[T <: Product] extends Component {
   def shouldRender(oldState: T) = state != oldState //TODO: deep compare
 }
 
-trait DataBinding[T <: Product] {
-  self: StatefullComponent[T] =>
-
-  def bind[U, E <: EventType](eventType: E)(path: T => U)(implicit value: eventType.Event => U): (E, Any) = macro DataBindingMacros.bindImpl[T,U,E]
-
-  def update[U](path: T => U, value: U): Unit = macro DataBindingMacros.updateImpl[T,U]
-
-}
