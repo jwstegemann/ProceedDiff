@@ -34,16 +34,16 @@ case class SimpleComponent(p1: String, p2: Int) extends StatefullComponent[MySta
   }
 
   def storeTo(e: TextEvent) : Any = {
-    setState(state.modify(_.to).setTo(e.input.value.toInt))
+    update(_.to, e.input.value.toInt)
     RangeStore.to = e.input.value.toInt
-    //TODO: set(_.to, e.input.value.toInt)
   }
 
   override def view(): Element = {
     println(s"renderings SimpleComponent with state.from=${state.from} and state.to=${state.to}")
 
     div()(
-      input(defaultValue = RangeStore.to.toString) ! bind(Input)(_.to), // onInput(_.storeTo),
+      input(defaultValue = RangeStore.to.toString) ! bind(Input)(_.to),
+//      input(defaultValue = RangeStore.to.toString) ! onInput(_.storeTo),
       p()(
         s"Ihre Eingabe lautet: ${state.to}"
       ),

@@ -126,4 +126,6 @@ trait DataBinding[T <: Product] {
 
   def bind[U, E <: EventType](eventType: E)(path: T => U)(implicit value: eventType.Event => U): (E, Any) = macro DataBindingMacros.bindImpl[T,U,E]
 
+  def update[U](path: T => U, value: U): Unit = macro DataBindingMacros.updateImpl[T,U]
+
 }

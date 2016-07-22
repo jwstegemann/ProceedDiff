@@ -18,7 +18,21 @@ object DataBindingMacros {
       q"""($eventType, (on: StatefullComponent[${symbolOf[T]}]) =>
          (e: Input.Event) => {
           on.setState($modification.setTo($value(e)))
-         })""")
+         })"""
+    )
+  }
+
+  def updateImpl[T: c.WeakTypeTag, U: c.WeakTypeTag]
+  (c: blackbox.Context)(path: c.Expr[T => U], value: c.Expr[U]): c.Expr[Unit] = {
+
+    import c.universe._
+
+    val stateExpression = c.Expr[T](q"state")
+    val modification = com.softwaremill.quicklens.QuicklensMacros.modify_impl(c)(stateExpression)(path)
+
+    c.Expr[Unit](
+      q"""setState($modification.setTo($value))"""
+    )
   }
 
 }
