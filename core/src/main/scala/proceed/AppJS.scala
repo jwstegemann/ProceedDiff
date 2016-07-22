@@ -40,7 +40,7 @@ case class SimpleComponent(p1: String, p2: Int) extends StatefullComponent[MySta
   }
 
   override def view(): Element = {
-    println(s"rendering SimpleComponent with state.from=${state.from} and state.to=${state.to}")
+    println(s"renderings SimpleComponent with state.from=${state.from} and state.to=${state.to}")
 
     div()(
       input(defaultValue = RangeStore.to.toString) ! bind(Input)(_.to), // onInput(_.storeTo),

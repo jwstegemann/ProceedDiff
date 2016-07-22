@@ -11,10 +11,14 @@ object DataBindingMacros {
 
     import c.universe._
 
+    val stateExpression = c.Expr[T](q"state")
+    val modification = com.softwaremill.quicklens.QuicklensMacros.modify_impl(c)(stateExpression)(path)
+
     c.Expr[(E, Any)](
-      q"""($eventType, (on: Component) =>
+      q"""($eventType, (on: StatefullComponent[${symbolOf[T]}]) =>
          (e: Input.Event) => {
-          println("IM MACRO!!!!!!!!!!!!!!!!!" + e)
+          on.setState($modification.setTo(e.input.value.toInt))
+          println("IM MACROss!!" + $modification + "!!!" + state + "!!!!!!!!!!!!" + e)
          })""")
   }
 
