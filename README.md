@@ -1,4 +1,4 @@
-https://travis-ci.com/jwstegemann/ProceedDiff.svg?token=zBsDYAoDLeq7AWeK5fyk&branch=master
+[![Build Status](https://travis-ci.com/jwstegemann/ProceedDiff.svg?token=zBsDYAoDLeq7AWeK5fyk&branch=master)](https://travis-ci.com/jwstegemann/ProceedDiff)
 
 
 # Proceed
