@@ -7,3 +7,6 @@ scala:
 branches:
   only:
   - master
+
+notifications:
+  slack: scala-proceed:MKw143dOhe44rlUFIliqpSYa
