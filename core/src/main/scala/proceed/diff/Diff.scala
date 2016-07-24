@@ -5,7 +5,6 @@ import proceed.diff.patch._
 import proceed.tree._
 import proceed.tree.html.TextNode
 
-
 object Diff {
 
   def compareAndPatchAttributes(oldElement: Element, newElement: Element, patchQueue: PatchQueue): Unit = {
@@ -17,6 +16,17 @@ object Diff {
           case className: ClassName => patchQueue.enqueue(SetClassName(newElement, className))
           case value => patchQueue.enqueue(SetAttribute(newElement, name, value.toString))
         }
+      }
+    }
+  }
+
+  def patchAttributes(newElement: Element, patchQueue: PatchQueue): Unit = {
+    for ((name, newValue) <- newElement.fields.iterator.zip(newElement.iterator)) {
+      newValue match {
+        case None =>
+        case optionalValue: Some[_] => patchQueue.enqueue(SetAttribute(newElement, name, optionalValue.get.toString))
+        case className: ClassName => patchQueue.enqueue(SetClassName(newElement, className))
+        case value => patchQueue.enqueue(SetAttribute(newElement, name, value.toString))
       }
     }
   }
@@ -71,6 +81,7 @@ object Diff {
     node match {
       case element: Element => {
         patchQueue.enqueue(CreateNewChild(parent, element, sibbling))
+        patchAttributes(element, patchQueue)
         diff(NoChildsMap, element.children, element.childrensPath, element, patchQueue)
       }
       case component: Component => {

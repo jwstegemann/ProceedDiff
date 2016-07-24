@@ -21,13 +21,12 @@ sealed trait Patch {
   def doWithDomTextRef(parent: TextNode, toDo: raw.Text => Any): Any = {
     parent.domRef match {
       case Some(parentDomRef: raw.Text) => toDo(parentDomRef)
-      case Some(_) => {}
+      case Some(_) =>
       case None => log.error(s"Parent $parent has no domRef yet.")
     }
   }
 
   def doWithDomNodeRef(parent: Node, toDo: raw.Node => Any): Any = {
-
     parent match {
       case e: Element => toDo(e.domRef.get)
       case t: TextNode =>  toDo(t.domRef.get)
@@ -43,16 +42,6 @@ sealed trait Patch {
     }
   }
 
-  def createAttributes(domElement: raw.Element, element: Element) = {
-    for ((name: String, newValue) <- element.fields.iterator.zip(element.iterator)) {
-      newValue match {
-        case value: Some[_] => domElement.setAttribute(name, value.get.toString)
-        case className: ClassName => if (className.size > 0) domElement.setAttribute("class", className.toString)
-        case None =>
-      }
-    }
-  }
-
   def gap(child: Node) = "  " * child.path.count(_ == '.')
 
 }
@@ -65,9 +54,8 @@ case class CreateNewChild(parent: Element, child: Node, sibbling: Option[Node]) 
       case textNode: TextNode => textNode.domRef = Some(dom.document.createTextNode(textNode.content))
       case element: Element => {
         val newDomElement = dom.document.createElement(element.nodeType)
-        newDomElement.id = child.key.getOrElse("")
+        if(child.key.isDefined) newDomElement.id = child.key.get
         newDomElement.setAttribute("data-proceed",element.childrensPath)
-        createAttributes(newDomElement, element)
         element.domRef = Some(newDomElement)
       }
     }
@@ -110,8 +98,8 @@ case class SetAttribute(element: Element, attribute: String, value: String) exte
 case class SetClassName(element: Element, className: ClassName) extends Patch {
   def execute() = {
     log.debug(gap(element) + "  -> set ClassNames " + className +  " @ " + element)
-
-    doWithDomElementRef(element, _.setAttribute("class", className.toString()))
+    if(className.size > 0)
+      doWithDomElementRef(element, _.setAttribute("class", className.toString()))
   }
 }
 
