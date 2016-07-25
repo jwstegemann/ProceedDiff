@@ -3,7 +3,7 @@ package proceed
 import com.softwaremill.quicklens._
 import proceed.events._
 import proceed.store.Store
-import proceed.tree.html._
+import proceed.tree.html.{button, div, input, p}
 import proceed.tree.{Component, Element, StatefullComponent}
 import proceed.util.log
 
@@ -53,7 +53,7 @@ case class SimpleComponent(p1: String, p2: Int) extends StatefullComponent[MySta
       p()(
         s"Ihre Eingabe lautet: ${RangeStore.to}"
       ),
-      button(className = "increase")(
+      button(className = "increase".addif("toHigh")(RangeStore.to > 100))(
         "increase"
       ) ! on(Click)(_.increase),
       MiddleComponent(RangeStore.from, RangeStore.to)
