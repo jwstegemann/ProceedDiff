@@ -1,5 +1,6 @@
 package proceed.tree
 
+import org.scalajs.dom
 import proceed.diff.RenderQueue
 import proceed.diff.patch.PatchQueue
 import proceed.events.{EventHandler, EventType}
@@ -37,18 +38,18 @@ trait Node {
 
   def getNewHandlingComponent(c: Option[Component]) = c
 
-  @tailrec final def handleEvent[A <: EventType](path: Seq[String], handlingComponent: Option[Component], eventType: A)(event: eventType.Event, patchQueue: PatchQueue): Unit = {
+  @tailrec final def handleEvent[A <: EventType](path: Seq[String], handlingComponent: Option[Component], eventType: A)(rawEvent: eventType.RawEvent, patchQueue: PatchQueue): Unit = {
     path match {
       case head :: Nil => children.getNode(head) match {
         case Some(handler: EventHandler) => {
-          if (handlingComponent.isDefined) handler.handle(handlingComponent.get, eventType)(event, patchQueue)
-          else log.error(s"No handling component could be found for event $event at $handler")
+          if (handlingComponent.isDefined) handler.handle(handlingComponent.get, eventType)(rawEvent, patchQueue)
+          else log.error(s"No handling component could be found for event $rawEvent at $handler")
         }
-        case _ => log.error(s"There is no child with key $head present at $this to handle event $event.")
+        case _ => log.error(s"There is no child with key $head present at $this to handle event $rawEvent.")
       }
       case head :: tail => children.getNode(head) match {
-        case Some(n: Node) => n.handleEvent(tail, getNewHandlingComponent(handlingComponent), eventType)(event, patchQueue)
-        case _ => log.error(s"There is no child with key $head present at $this to delegate event $event to.")
+        case Some(n: Node) => n.handleEvent(tail, getNewHandlingComponent(handlingComponent), eventType)(rawEvent, patchQueue)
+        case _ => log.error(s"There is no child with key $head present at $this to delegate event $rawEvent to.")
       }
       case x => log.debug(s"Unexpected error handling event:  ${x.toString}")
     }

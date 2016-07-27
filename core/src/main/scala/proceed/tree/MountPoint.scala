@@ -32,40 +32,26 @@ case class MountPoint() extends Element {
   def setEventListener() = {
     domRef match {
       case (Some(Left(domElementRef))) => {
-        domElementRef.addEventListener("input", handleNativeEvent("input") _, false)
-        domElementRef.addEventListener("click", handleNativeEvent("click") _, false)
-        domElementRef.addEventListener("keypress", handleNativeEvent("keypress") _, false)
-        domElementRef.addEventListener("change", handleNativeEvent("change") _, false)
-        domElementRef.addEventListener("input", handleNativeEvent("input") _, false)
+        domElementRef.addEventListener(Input.key, handleNativeEvent(Input) _, false)
+        domElementRef.addEventListener(Click.key, handleNativeEvent(Click) _, false)
+//        domElementRef.addEventListener("keypress", handleNativeEvent("keypress") _, false)
+//        domElementRef.addEventListener("change", handleNativeEvent("change") _, false)
+//        domElementRef.addEventListener("input", handleNativeEvent("input") _, false)
       }
       case _ => log.debug(s"MountPoint $this is not available to register event-listeners.")
     }
   }
 
-  def handleNativeEvent[T <: dom.Event](rawTypeString: String)(rawEvent: T) = {
+  def handleNativeEvent(eventType: EventType)(rawEvent: eventType.RawEvent) = {
     rawEvent.stopPropagation()
     //rawEvent.preventDefault()
 
     val path = rawEvent.srcElement.getAttribute("data-proceed").split('.').tail.toList
 
-    log.debug(s"handling $rawTypeString-event ${rawEvent} of ${rawEvent.`type`} @ $path")
+    log.debug(s"handling ${eventType.key}-event ${rawEvent} of ${rawEvent.`type`} @ $path")
 
     App.startEventLoop((patchQueue: PatchQueue) =>
-      //FIXME: change order
-      (rawEvent, rawEvent.`type`) match {
-        case (e: dom.MouseEvent, "click") =>
-          handleEvent(path, None, Click)(
-            MouseEvent(e.clientX.toInt, e.clientY.toInt, e.altKey, e.ctrlKey, e.metaKey, e.shiftKey), patchQueue)
-        case (e: dom.KeyboardEvent, "keypress") =>
-          handleEvent(path, None, Keypress)(
-            KeyboardEvent(e.keyCode, e.altKey, e.ctrlKey, e.metaKey, e.shiftKey), patchQueue)
-        case (e: dom.Event, "change") =>
-          handleEvent(path, None, Change)(
-            TargetEvent(e.srcElement), patchQueue)
-        case (e: dom.Event, "input") =>
-          handleEvent(path, None, Input)(
-            TextEvent.fromEvent(e), patchQueue)
-      }
+      handleEvent(path, None, eventType)(rawEvent, patchQueue)
     )
     
   }

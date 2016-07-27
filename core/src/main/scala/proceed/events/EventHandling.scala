@@ -15,21 +15,21 @@ trait EventHandler {
   val handlers = new mutable.HashMap[EventType, Any]
 
 
-  def handle[X <: EventType, C <: Component](on: C, t: X)(event: t.Event, patchQueue: PatchQueue): Unit = {
+  def handle[X <: EventType, C <: Component](on: C, t: X)(rawEvent: t.RawEvent, patchQueue: PatchQueue): Unit = {
     handlers.get(t).foreach {
       case f => {
         val handler = f.asInstanceOf[(C) => (t.Event) => Any]
         on match {
           case sc: StatefullComponent[Product] => {
             val oldState = sc.state
-            log.debug(s"calling handler for ${event.toString} on $on")
-            handler(on)(event)
+            log.debug(s"calling handler for ${rawEvent.toString} on $on")
+            handler(on)(t.wrap(rawEvent))
             if (sc.dirty && sc.shouldRender(oldState)) {
               App.renderQueue.enqueue(RenderItem(sc.durable, sc.parent, None, patchQueue))
             }
           }
           case c => {
-            handler(on)(event)
+            handler(on)(t.wrap(rawEvent))
           }
         }
       }
