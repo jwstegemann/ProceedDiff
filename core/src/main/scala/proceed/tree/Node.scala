@@ -1,14 +1,15 @@
 package proceed.tree
 
-import proceed.diff.RenderQueue
 import proceed.diff.patch.PatchQueue
 import proceed.events.{EventHandler, EventType}
+import proceed.tree.html.TextNode
 import proceed.util.log
 
 import scala.annotation.tailrec
 
 
 trait Node {
+
   var path: String = _
   var id: String = _
   var key: Option[String] = None
@@ -16,7 +17,7 @@ trait Node {
   lazy val childrensPath = s"$path.$id"
 
   //TODO: write macro for this (and maybe even generate hash)
-  lazy val nodeType: String = this.getClass.getSimpleName()
+  lazy val nodeType: String = this.getClass.getSimpleName
 
   def as(name: String) = {
     this.key = Some(name)
@@ -24,6 +25,16 @@ trait Node {
   }
 
   var children: ChildMap = NoChildsMap
+
+  implicit def string2Node(s: String): TextNode = TextNode(s)
+  implicit def string2Option(s: String): Option[String] = Some(s)
+  implicit def boolean2Option(b: Boolean): Option[Boolean] = Some(b)
+  implicit def int2Option(i: Int): Option[Int] = Some(i)
+
+  implicit class String2ClassName(s: String) {
+    def add(x: String): ClassName = ClassName(s) add ClassName(x)
+    def addif(x: ClassName)(f: => Boolean) = ClassName(s).addif(x)(f)
+  }
 
   /*
   def @#(name: String) = {
@@ -69,7 +80,6 @@ trait Node {
       case Nil =>
     }
   }
-
 }
 
 object EmptyNode extends Node {
