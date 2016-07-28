@@ -39,7 +39,8 @@ object Diff {
         if (oldText.content != newText.content) patchQueue.enqueue(ChangeText(newText, parent, newText.content))
       }
       case (oldElement: Element, newElement: Element) => {
-        newElement.domRef = oldElement.domRef
+        //TODO: get rid of cast?
+        newElement.domRef = oldElement.domRef.asInstanceOf[Option[newElement.DomNodeRefType]]
         compareAndPatchAttributes(oldElement, newElement, patchQueue)
         // continue comparing children
         diff(oldElement.children, newElement.children, newElement.childrensPath, newElement, patchQueue)

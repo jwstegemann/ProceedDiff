@@ -2,6 +2,7 @@ package proceed.tree
 
 import proceed.diff.patch.PatchQueue
 import proceed.events.{EventHandler, EventType}
+import proceed.tree.html.TextNode
 import proceed.util.log
 
 import scala.annotation.tailrec

@@ -4,6 +4,7 @@ import proceed.diff.patch.PatchQueue
 import proceed.diff.{Diff, RenderItem}
 import proceed.events.{EventDelegate, EventType}
 import proceed.store.{Store, Subscriber}
+import proceed.tree.html.TextNode
 import proceed.util.log
 import proceed.{App, DataBindingMacros}
 
@@ -89,6 +90,17 @@ abstract class Component extends Node with EventDelegate {
 
   def isRemoved(): Unit = {}
   def init(): Unit = {}
+
+
+  implicit def string2Node(s: String): DomNode = TextNode(s)
+  implicit def string2Option(s: String): Option[String] = Some(s)
+  implicit def boolean2Option(b: Boolean): Option[Boolean] = Some(b)
+  implicit def int2Option(i: Int): Option[Int] = Some(i)
+
+  implicit class String2ClassName(s: String) {
+    def add(x: String): ClassName = ClassName(s) add ClassName(x)
+    def addif(x: ClassName)(f: => Boolean) = ClassName(s).addif(x)(f)
+  }
 }
 
 

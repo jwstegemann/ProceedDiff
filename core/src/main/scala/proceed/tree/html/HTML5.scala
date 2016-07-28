@@ -11,7 +11,7 @@ import proceed.tree.{ClassName, DomNode}
 
 
 
-
+/*
 case class progress(max: Option[Double] = None,
                     value: Option[Double] = None,
                     title: Option[String] = None,
@@ -38,3 +38,4 @@ case class progress(max: Option[Double] = None,
       "className" :: Nil
 
 }
+*/

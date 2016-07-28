@@ -2,8 +2,8 @@ package proceed
 
 import proceed.events._
 import proceed.store.Store
-import proceed.tree.html._
-import proceed.tree.{Component, DomNode, StatefullComponent}
+import proceed.tree.html.{TextNode, _}
+import proceed.tree._
 
 import scala.scalajs.js.JSApp
 

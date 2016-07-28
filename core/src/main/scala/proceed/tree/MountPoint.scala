@@ -17,9 +17,9 @@ case class MountPoint() extends Element {
 
   override val fields: Seq[String] = Nil
 
-  override def apply(c: DomNode, cs: DomNode*): DomNode = throw new UnsupportedOperationException
-  override def apply(cs: Seq[DomNode]): DomNode with Product = throw new UnsupportedOperationException
-  override def apply(): DomNode = throw new UnsupportedOperationException
+  override def apply(c: Node, cs: Node*): Element = throw new UnsupportedOperationException
+  override def apply(cs: Seq[Node]): Element with Product = throw new UnsupportedOperationException
+  override def apply(): Element = throw new UnsupportedOperationException
 
   def init(domId: String): MountPoint = {
     id = domId

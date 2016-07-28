@@ -60,7 +60,7 @@ case class a(accessKey: Option[String] = None,
       "dir" ::
       "className" :: Nil
 
-  override type DomNodeRefType = raw.HTMLAnchorElement
+  type DomNodeRefType = raw.HTMLAnchorElement
 }
 
 case class button(accessKey: Option[String] = None,
@@ -87,7 +87,7 @@ case class button(accessKey: Option[String] = None,
       "typeName" ::
       "className" :: Nil
 
-  override type DomNodeRefType = raw.HTMLButtonElement
+  type DomNodeRefType = raw.HTMLButtonElement
 }
 
 case class div(align: Option[String] = None,
@@ -103,7 +103,7 @@ case class div(align: Option[String] = None,
       "dir" ::
       "className" :: Nil
 
-  override type DomNodeRefType = raw.HTMLDivElement
+  type DomNodeRefType = raw.HTMLDivElement
 }
 
 case class input(defaultValue: Option[String] = None,
@@ -151,7 +151,7 @@ case class input(defaultValue: Option[String] = None,
       "dir" ::
       "className" :: Nil
 
-  override type DomNodeRefType = raw.HTMLInputElement
+  type DomNodeRefType = raw.HTMLInputElement
 }
 
 case class p(align: Option[String] = None,
@@ -166,5 +166,5 @@ case class p(align: Option[String] = None,
     "dir" ::
     "className" :: Nil
 
-  override type DomNodeRefType = raw.HTMLProgressElement
+  type DomNodeRefType = raw.HTMLProgressElement
 }

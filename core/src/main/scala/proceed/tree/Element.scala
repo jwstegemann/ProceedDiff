@@ -2,6 +2,7 @@ package proceed.tree
 
 import org.scalajs.dom
 import org.scalajs.dom.raw
+import proceed.tree.html.TextNode
 
 /**
   * Element
@@ -9,17 +10,15 @@ import org.scalajs.dom.raw
   * @author Jan Weidenhaupt
   * @since 1.0
   */
-trait Element extends DomNode {
+abstract class Element extends DomNode {
   p: Product =>
 
-  type DomNodeRefType = raw.Element
-
-  def apply(c: DomNode, cs: DomNode*): DomNode = {
+  def apply(c: Node, cs: Node*): Element = {
     apply(c +: cs)
     this
   }
 
-  def apply(cs: Seq[DomNode]): DomNode = {
+  def apply(cs: Seq[Node]): Element = {
     children = new ChildMapImpl
     cs.zipWithIndex.foreach {
       case (n: Node, i: Int) => children.add(i, n)
@@ -27,7 +26,7 @@ trait Element extends DomNode {
     this
   }
 
-  def apply(): DomNode = {
+  def apply(): Element = {
     this
   }
 
@@ -35,7 +34,7 @@ trait Element extends DomNode {
     val newDomElement = dom.document.createElement(this.nodeType)
     if(this.key.isDefined) newDomElement.id = this.key.get
     newDomElement.setAttribute("data-proceed",this.childrensPath)
-    this.domRef = Some(newDomElement)
+    this.domRef = Some(newDomElement.asInstanceOf[DomNodeRefType])
   }
 
   def domNode = this
