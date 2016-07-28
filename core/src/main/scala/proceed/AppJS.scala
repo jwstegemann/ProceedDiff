@@ -2,8 +2,8 @@ package proceed
 
 import proceed.events._
 import proceed.store.Store
-import proceed.tree.html.{TextNode, _}
 import proceed.tree._
+import proceed.tree.html._
 
 import scala.scalajs.js.JSApp
 
@@ -30,6 +30,7 @@ case class SimpleComponent(p1: String, p2: Int) extends StatefullComponent[MySta
 
   def increase(e: MouseEvent) : Any = {
     RangeStore.inc()
+    update(_.to, state.to+1)
   }
 
   def storeTo(e: TextEvent) : Any = {
@@ -41,15 +42,14 @@ case class SimpleComponent(p1: String, p2: Int) extends StatefullComponent[MySta
     println(s"rendering SimpleComponent with state.from=${state.from} and state.to=${state.to}")
 
     div()(
-      input(defaultValue = RangeStore.to.toString) ! bind(Input)(_.to),
-//      input(defaultValue = RangeStore.to.toString) ! onInput(_.storeTo),
+//      input(defaultValue = RangeStore.to.toString) ! bind(Input)(_.to),
+      input(defaultValue = RangeStore.to.toString) ! onInput(_.storeTo),
       p()(
         s"Ihre Eingabe lautet: ${state.to}"
       ),
       p()(
         "increase"
       ).as("dummy") ! on(Click)(_.increase),
-      if (state.to > 4) button(title=Some("p7")) else div() as "xsonst",
       MiddleComponent(RangeStore.from, RangeStore.to)
     )
   }
@@ -80,13 +80,13 @@ case class MiddleComponent(from: Int, to: Int) extends StatefullComponent[MyStat
         "decrease"
       ).as("dummy") ! on(Click)(_.decrease(17)),
       //        p().on(Click, this)((c: MiddleComponent, e: MouseEvent) => setState(state.copy(to = state.to-1))).as("dummy"),
-      MoreComplexComponent(from, to, true)
+      MoreComplexComponent(from, to)
     )
 
   }
 }
 
-case class MoreComplexComponent(from: Int, to: Int, p3: Boolean) extends Component {
+case class MoreComplexComponent(from: Int, to: Int) extends Component {
   override def view(): DomNode = {
     println(s"rendering MoreComplexComponent with from=$from and to=$to")
 
