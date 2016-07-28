@@ -1,8 +1,6 @@
 package proceed.events
 
-import org.scalajs.dom
-import org.scalajs.dom.raw.HTMLInputElement
-import proceed.util.log
+import org.scalajs.dom.raw
 
 // http://www.w3schools.com/jsref/dom_obj_event.asp
 // https://facebook.github.io/react/docs/events.html
@@ -20,13 +18,13 @@ case class KeyboardEvent(which: Int, altKey: Boolean,
 
 case class FocusEvent()
 
-case class TargetEvent(domRef: dom.Element)
+case class TargetEvent(domRef: raw.Element)
 
-case class TextEvent(input: HTMLInputElement)
+case class TextEvent(input: raw.HTMLInputElement)
 
 object TextEvent {
-  def fromEvent(e: dom.Event) = {
-    TextEvent(e.target.asInstanceOf[HTMLInputElement])
+  def fromEvent(e: raw.Event) = {
+    TextEvent(e.target.asInstanceOf[raw.HTMLInputElement])
   }
 }
 
