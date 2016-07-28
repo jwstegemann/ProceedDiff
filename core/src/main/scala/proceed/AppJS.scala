@@ -43,7 +43,7 @@ case class SimpleComponent(p1: String, p2: Int) extends StatefullComponent[MySta
 
     div()(
 //      input(defaultValue = RangeStore.to.toString) ! bind(Input)(_.to),
-      input(defaultValue = RangeStore.to.toString) ! onInput(_.storeTo),
+      input(value = RangeStore.to.toString) ! onInput(_.storeTo),
       p()(
         s"Ihre Eingabe lautet: ${state.to}"
       ),
