@@ -12,7 +12,7 @@ trait ChildMap {
 }
 
 object ChildMap {
-  def apply(element: Element) = {
+  def apply(element: DomNode) = {
     val children = new ChildMapImpl()
     children.add(0,element)
     children

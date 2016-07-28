@@ -1,10 +1,8 @@
 package proceed.tree
 
-import java.lang.reflect.MalformedParametersException
-
 import org.scalajs.dom
+import org.scalajs.dom.raw
 import proceed.App
-import proceed.diff.RenderQueue
 import proceed.diff.patch.PatchQueue
 import proceed.events._
 import proceed.util.log
@@ -14,24 +12,27 @@ object MountPoint {
 }
 
 case class MountPoint() extends Element {
+
+  override type DomNodeRefType = raw.Element
+
   override val fields: Seq[String] = Nil
 
-  override def apply(c: Node, cs: Node*): Element = throw new UnsupportedOperationException
-  override def apply(cs: Seq[Node]): Element with Product = throw new UnsupportedOperationException
-  override def apply(): Element = throw new UnsupportedOperationException
+  override def apply(c: DomNode, cs: DomNode*): DomNode = throw new UnsupportedOperationException
+  override def apply(cs: Seq[DomNode]): DomNode with Product = throw new UnsupportedOperationException
+  override def apply(): DomNode = throw new UnsupportedOperationException
 
   def init(domId: String): MountPoint = {
     id = domId
     val temp = dom.document.getElementById(id)
     if (temp == null) throw new RuntimeException(s"There is no element with id $domId to serve as MountPoint")
-    domRef = Some(Left(temp))
+    domRef = Some(temp)
     setEventListener()
     this
   }
 
   def setEventListener() = {
     domRef match {
-      case (Some(Left(domElementRef))) => {
+      case (Some(domElementRef)) => {
         domElementRef.addEventListener("input", handleNativeEvent("input") _, false)
         domElementRef.addEventListener("click", handleNativeEvent("click") _, false)
         domElementRef.addEventListener("keypress", handleNativeEvent("keypress") _, false)
@@ -48,7 +49,7 @@ case class MountPoint() extends Element {
 
     val path = rawEvent.srcElement.getAttribute("data-proceed").split('.').tail.toList
 
-    log.debug(s"handling $rawTypeString-event ${rawEvent} of ${rawEvent.`type`} @ $path")
+    log.debug(s"handling $rawTypeString-event $rawEvent of ${rawEvent.`type`} @ $path")
 
     App.startEventLoop((patchQueue: PatchQueue) =>
       //FIXME: change order
@@ -67,7 +68,7 @@ case class MountPoint() extends Element {
             TextEvent.fromEvent(e), patchQueue)
       }
     )
-    
+
   }
 }
 

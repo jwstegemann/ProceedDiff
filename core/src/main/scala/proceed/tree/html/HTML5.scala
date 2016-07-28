@@ -1,6 +1,6 @@
 package proceed.tree.html
 
-import proceed.tree.{ClassName, Element}
+import proceed.tree.{ClassName, DomNode}
 
 /**
   * All new HTML5 Elements
@@ -17,7 +17,7 @@ case class progress(max: Option[Double] = None,
                     title: Option[String] = None,
                     lang: Option[String] = None,
                     dir: Option[String] = None,
-                    className: ClassName = "") extends Element {
+                    className: ClassName = "") extends DomNode {
 
   override val fields =
     "accessKey" ::

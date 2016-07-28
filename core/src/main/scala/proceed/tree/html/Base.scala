@@ -1,7 +1,8 @@
 package proceed.tree.html
 
+import org.scalajs.dom
 import org.scalajs.dom.raw
-import proceed.tree.{ClassName, Element, Node}
+import proceed.tree.{ClassName, DomNode, Element}
 
 /**
   * All basic html-elements
@@ -10,13 +11,17 @@ import proceed.tree.{ClassName, Element, Node}
   * @author Jan Weidenhaupt
   */
 
-case class TextNode(content: String) extends Node {
+case class TextNode(content: String) extends DomNode {
+
+  type DomNodeRefType = raw.Text
 
   val fields: Seq[String] = "content" :: Nil
 
-  var domRef: Option[raw.Text] = None
+  def domNode: DomNode = throw new UnsupportedOperationException
 
-  def node: TextNode = this
+  def createDomRef() = {
+    this.domRef = Some(dom.document.createTextNode(this.content))
+  }
 }
 
 
@@ -55,6 +60,7 @@ case class a(accessKey: Option[String] = None,
       "dir" ::
       "className" :: Nil
 
+  override type DomNodeRefType = raw.HTMLAnchorElement
 }
 
 case class button(accessKey: Option[String] = None,
@@ -81,6 +87,7 @@ case class button(accessKey: Option[String] = None,
       "typeName" ::
       "className" :: Nil
 
+  override type DomNodeRefType = raw.HTMLButtonElement
 }
 
 case class div(align: Option[String] = None,
@@ -89,12 +96,14 @@ case class div(align: Option[String] = None,
                dir: Option[String] = None,
                className: ClassName = "") extends Element {
 
-  override val fields =
+  val fields =
     "align" ::
       "title" ::
       "lang" ::
       "dir" ::
       "className" :: Nil
+
+  override type DomNodeRefType = raw.HTMLDivElement
 }
 
 case class input(defaultValue: Option[String] = None,
@@ -141,6 +150,8 @@ case class input(defaultValue: Option[String] = None,
       "lang" ::
       "dir" ::
       "className" :: Nil
+
+  override type DomNodeRefType = raw.HTMLInputElement
 }
 
 case class p(align: Option[String] = None,
@@ -155,4 +166,5 @@ case class p(align: Option[String] = None,
     "dir" ::
     "className" :: Nil
 
+  override type DomNodeRefType = raw.HTMLProgressElement
 }

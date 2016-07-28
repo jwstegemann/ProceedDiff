@@ -1,27 +1,25 @@
 package proceed.tree
 
+import org.scalajs.dom
 import org.scalajs.dom.raw
-import proceed.events.{EventHandler}
 
-
-abstract class Element extends Node with EventHandler {
+/**
+  * Element
+  *
+  * @author Jan Weidenhaupt
+  * @since 1.0
+  */
+trait Element extends DomNode {
   p: Product =>
 
-  val fields: Seq[String]
-  var domRef: Option[Either[raw.Element, raw.Text]] = None
+  type DomNodeRefType = raw.Element
 
-
-  override def as(name: String): Element = {
-    super.as(name)
-    this
-  }
-
-  def apply(c: Node, cs: Node*): Element = {
+  def apply(c: DomNode, cs: DomNode*): DomNode = {
     apply(c +: cs)
     this
   }
 
-  def apply(cs: Seq[Node]): Element = {
+  def apply(cs: Seq[DomNode]): DomNode = {
     children = new ChildMapImpl
     cs.zipWithIndex.foreach {
       case (n: Node, i: Int) => children.add(i, n)
@@ -29,11 +27,16 @@ abstract class Element extends Node with EventHandler {
     this
   }
 
-  def apply(): Element = {
+  def apply(): DomNode = {
     this
   }
 
-  override def element() = this
+  def createDomRef() = {
+    val newDomElement = dom.document.createElement(this.nodeType)
+    if(this.key.isDefined) newDomElement.id = this.key.get
+    newDomElement.setAttribute("data-proceed",this.childrensPath)
+    this.domRef = Some(newDomElement)
+  }
 
-  def iterator = p.productIterator
+  def domNode = this
 }

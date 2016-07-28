@@ -1,6 +1,6 @@
 package proceed.util
 
-import proceed.tree.{ChildMapImpl, Element, Node}
+import proceed.tree.{ChildMapImpl, DomNode, Node}
 
 object PrettyPrinter {
 
@@ -12,7 +12,7 @@ object PrettyPrinter {
 
   def handle(level: Int, builder: StringBuilder, node: Node): Unit = {
     node match {
-      case n: Element => handle(level, builder, n)
+      case n: DomNode => handle(level, builder, n)
 //      case n: Component => handle(level, builder, n)
 //      case n: TextNode => handle(level, builder, n)
     }
@@ -28,7 +28,7 @@ object PrettyPrinter {
     builder.append("\n")
   }
 
-  def handle(level: Int, builder: StringBuilder, node: Element): Unit = {
+  def handle(level: Int, builder: StringBuilder, node: DomNode): Unit = {
     printObjectAndId(level, builder, node)
     node.children match {
       case (c: ChildMapImpl) => c.foreach { case (key: String, (p: Int, n: Node)) => handle(level+1, builder, n) }

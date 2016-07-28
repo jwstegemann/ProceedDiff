@@ -1,15 +1,15 @@
 package proceed.events
 
 import proceed.App
+import proceed.diff.RenderItem
 import proceed.diff.patch.PatchQueue
-import proceed.diff.{RenderItem}
-import proceed.tree.{Component, Element, StatefullComponent}
+import proceed.tree.{Component, DomNode, StatefullComponent}
 import proceed.util.log
+
 import scala.collection.mutable
-import proceed.events.Input
 
 trait EventHandler {
-  self: Element =>
+  self: DomNode =>
 
   type Handler = (EventType, Any)
 
@@ -37,7 +37,7 @@ trait EventHandler {
     }
   }
 
-  def !(entry: Handler): Element = {
+  def !(entry: Handler): DomNode = {
     handlers += entry
     self
   }
@@ -56,5 +56,4 @@ trait EventDelegate {
   final def on[T <: EventType](t: T)(handler: this.type => (t.Event => Any)) = (t, handler)
 
   final def onInput = on(Input) _
-
 }

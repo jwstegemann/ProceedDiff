@@ -1,13 +1,13 @@
 package proceed.diff
 
 import proceed.diff.patch.PatchQueue
-import proceed.tree.{DurableLink, Element}
+import proceed.tree.{DomNode, DurableLink}
 import proceed.util.log
 
 import scala.collection.mutable
 
 
-case class RenderItem(component: DurableLink, parent: Element, sibbling: Option[Element], patchQueue: PatchQueue) {
+case class RenderItem(component: DurableLink, parent: DomNode, sibbling: Option[DomNode], patchQueue: PatchQueue) {
   lazy val depth = component.transient.path.count(_ == '.')
 
   def render(queue: RenderQueue) = {

@@ -5,7 +5,6 @@ import proceed.diff.patch._
 import proceed.tree._
 import proceed.tree.html.TextNode
 
-
 object Diff {
 
   def compareAndPatchAttributes(oldElement: Element, newElement: Element, patchQueue: PatchQueue): Unit = {
@@ -21,8 +20,19 @@ object Diff {
     }
   }
 
+  def patchAttributes(newElement: DomNode, patchQueue: PatchQueue): Unit = {
+    for ((name, newValue) <- newElement.fields.iterator.zip(newElement.iterator)) {
+      newValue match {
+        case None =>
+        case optionalValue: Some[_] => patchQueue.enqueue(SetAttribute(newElement, name, optionalValue.get.toString))
+        case className: ClassName => patchQueue.enqueue(SetClassName(newElement, className))
+        case value => patchQueue.enqueue(SetAttribute(newElement, name, value.toString))
+      }
+    }
+  }
+
   // reuse node at the same place (id stays the same)
-  def reuse(parent: Element, oldNode: Node, newNode: Node, patchQueue: PatchQueue) = {
+  def reuse(parent: DomNode, oldNode: Node, newNode: Node, patchQueue: PatchQueue) = {
     (oldNode, newNode) match {
       case (oldText: TextNode, newText: TextNode) => {
         newText.domRef = oldText.domRef
@@ -62,31 +72,32 @@ object Diff {
   }
 
   // move node to another place and reuse (ChildMap.key changes)
-  def move(parent: Element, oldNode: Node, newNode: Node, sibbling: Option[Node], patchQueue: PatchQueue) = {
-    patchQueue.enqueue(MoveChild(parent, newNode.element, sibbling))
+  def move(parent: DomNode, oldNode: Node, newNode: Node, sibbling: Option[Node], patchQueue: PatchQueue) = {
+    patchQueue.enqueue(MoveChild(parent, newNode.domNode, sibbling))
     reuse(parent, oldNode, newNode, patchQueue)
   }
 
-  def insertOrAppendNew(path: String, parent: Element, node: Node, sibbling: Option[Node], patchQueue: PatchQueue) = {
+  def insertOrAppendNew(path: String, parent: DomNode, node: Node, sibbling: Option[Node], patchQueue: PatchQueue) = {
     node match {
-      case element: Element => {
+      case element: DomNode => {
         patchQueue.enqueue(CreateNewChild(parent, element, sibbling))
+        patchAttributes(element, patchQueue)
         diff(NoChildsMap, element.children, element.childrensPath, element, patchQueue)
       }
       case component: Component => {
         component.parent = parent
         component.prepare()
-        patchQueue.enqueue(App.renderQueue.enqueue(RenderItem(component.durable, parent, sibbling.map(s => s.element), new PatchQueue)))
+        patchQueue.enqueue(App.renderQueue.enqueue(RenderItem(component.durable, parent, sibbling.map(s => s.domNode), new PatchQueue)))
       }
     }
   }
 
-  def delete(parent: Element, node: Node, patchQueue: PatchQueue) = {
-    patchQueue.enqueue(DeleteChild(parent, node.element))
+  def delete(parent: DomNode, node: Node, patchQueue: PatchQueue) = {
+    patchQueue.enqueue(DeleteChild(parent, node.domNode))
     node.traverseComponents(_.remove())
   }
 
-  def diff(oldList: ChildMap, newList: ChildMap, path: String, parentElement: Element, patchQueue: PatchQueue) : Unit = {
+  def diff(oldList: ChildMap, newList: ChildMap, path: String, parentElement: DomNode, patchQueue: PatchQueue) : Unit = {
 
     val oldIterator = oldList.iterate()
     val newIterator = newList.iterate()

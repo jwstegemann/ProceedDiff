@@ -1,10 +1,9 @@
 package proceed
 
-import proceed.store.Store
 import proceed.events._
+import proceed.store.Store
 import proceed.tree.html._
-import proceed.tree.{Component, Element, StatefullComponent}
-import com.softwaremill.quicklens._
+import proceed.tree.{Component, DomNode, StatefullComponent}
 
 import scala.scalajs.js.JSApp
 
@@ -34,16 +33,16 @@ case class SimpleComponent(p1: String, p2: Int) extends StatefullComponent[MySta
   }
 
   def storeTo(e: TextEvent) : Any = {
-    setState(state.modify(_.to).setTo(e.input.value.toInt))
+    update(_.to, e.input.value.toInt)
     RangeStore.to = e.input.value.toInt
-    //TODO: set(_.to, e.input.value.toInt)
   }
 
-  override def view(): Element = {
+  override def view(): DomNode = {
     println(s"rendering SimpleComponent with state.from=${state.from} and state.to=${state.to}")
 
     div()(
-      input(defaultValue = RangeStore.to.toString) ! onInput(_.storeTo),
+      input(defaultValue = RangeStore.to.toString) ! bind(Input)(_.to),
+//      input(defaultValue = RangeStore.to.toString) ! onInput(_.storeTo),
       p()(
         s"Ihre Eingabe lautet: ${state.to}"
       ),
@@ -88,7 +87,7 @@ case class MiddleComponent(from: Int, to: Int) extends StatefullComponent[MyStat
 }
 
 case class MoreComplexComponent(from: Int, to: Int, p3: Boolean) extends Component {
-  override def view(): Element = {
+  override def view(): DomNode = {
     println(s"rendering MoreComplexComponent with from=$from and to=$to")
 
     div()(
@@ -98,8 +97,6 @@ case class MoreComplexComponent(from: Int, to: Int, p3: Boolean) extends Compone
 }
 
 object AppJS extends JSApp {
-
-  Macros.hello
 
   @scala.scalajs.js.annotation.JSExport
   override def main(): Unit = {
