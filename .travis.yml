@@ -1,0 +1,12 @@
+language: scala
+
+scala:
+   - 2.11.8
+
+# safelist
+branches:
+  only:
+  - master
+
+notifications:
+  slack: scala-proceed:MKw143dOhe44rlUFIliqpSYa
