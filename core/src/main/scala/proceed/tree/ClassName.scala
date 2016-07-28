@@ -9,7 +9,6 @@ import scala.collection.mutable
   * and present some methods for adding or removing classNames
   *
   * @author Jan Weidenhaupt
-  *         13.07.2016
   */
 sealed case class ClassName(private final val list: mutable.HashSet[String]) {
 
@@ -17,40 +16,32 @@ sealed case class ClassName(private final val list: mutable.HashSet[String]) {
 
   lazy val size: Int = list.size
 
-  def :+(c: ClassName): ClassName = {
+  def add(c: ClassName): ClassName = {
     list ++= c.list
     this
   }
 
-  def :-(c: ClassName): ClassName = {
+  def addif(c: ClassName)(f: => Boolean): ClassName = if(f) add(c) else this
+
+  def remove(c: ClassName): ClassName = {
     list --= c.list
     this
   }
+
+  def removeif(c: ClassName)(f: => Boolean): ClassName = if(f) remove(c) else this
 
   def filter(f: (String) => Boolean): ClassName = ClassName(list.filter(f))
 }
 
 object ClassName {
 
-  def apply(s: String*): ClassName = {
-    ClassName(mutable.HashSet.empty[String] ++ s.filterNot(_ == "").view)
+  def apply(s: String): ClassName = {
+    if(!s.trim.isEmpty) ClassName(mutable.HashSet.empty[String] + s)
+    else empty
   }
 
-  def empty: ClassName = {
-    NilClass
-  }
+  def empty: ClassName = ClassName(mutable.HashSet.empty[String])
 
-  implicit def string2ClassName(s: String): ClassName = {
-    ClassName(s)
-  }
+  implicit def string2ClassName(s: String): ClassName = ClassName(s)
 }
-
-object c {
-
-  def apply(s: String*): ClassName = {
-    ClassName(mutable.HashSet.empty[String] ++ s.filterNot(_ == "").view)
-  }
-}
-
-object NilClass extends ClassName(mutable.HashSet.empty[String])
 
