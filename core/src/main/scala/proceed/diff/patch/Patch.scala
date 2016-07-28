@@ -115,7 +115,7 @@ case class MoveChild(parent: DomNode, child: Node, sibbling: Option[Node]) exten
     doWithDomElementRef(parent, parentDomRef =>
       doWithSibblingDomRef(sibbling,
         sibblingDomRef => doWithDomNodeRef(child, parentDomRef.insertBefore(_,sibblingDomRef)),
-        () => doWithDomNodeRef(child, parentDomRef.appendChild(_))
+        () => doWithDomNodeRef(child, parentDomRef.appendChild)
       )
     )
   }
@@ -123,6 +123,6 @@ case class MoveChild(parent: DomNode, child: Node, sibbling: Option[Node]) exten
 
 class PatchQueue extends scala.collection.mutable.Queue[Patch] with Patch {
 
-  def execute() = foreach(_.execute)
+  def execute() = foreach(_.execute())
 
 }
