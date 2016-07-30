@@ -1,4 +1,6 @@
-[![Build Status](https://travis-ci.com/jwstegemann/ProceedDiff.svg?token=zBsDYAoDLeq7AWeK5fyk&branch=master)](https://travis-ci.com/jwstegemann/ProceedDiff)
+[![Build Status](https://travis-ci.com/jwstegemann/proceed.svg?token=zBsDYAoDLeq7AWeK5fyk&branch=master)](https://travis-ci.com/jwstegemann/proceed)
+
+[![Scala.js](https://www.scala-js.org/assets/badges/scalajs-0.6.8.svg)](https://www.scala-js.org)
 
 
 # Proceed
