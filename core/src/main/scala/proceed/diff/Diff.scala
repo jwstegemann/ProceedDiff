@@ -5,6 +5,8 @@ import proceed.diff.patch._
 import proceed.tree._
 import proceed.tree.html.TextNode
 
+import scalacss.StyleA
+
 object Diff {
 
   def compareAndPatchAttributes(oldElement: Element, newElement: Element, patchQueue: PatchQueue): Unit = {
@@ -12,8 +14,8 @@ object Diff {
       if (oldValue != newValue) {
         newValue match {
           case None => patchQueue.enqueue(RemoveAttribute(newElement, name))
+          case Some(className: StyleA) => patchQueue.enqueue(SetClassName(newElement, className))
           case optionalValue: Some[_] => patchQueue.enqueue(SetAttribute(newElement, name, optionalValue.get.toString))
-          case className: ClassName => patchQueue.enqueue(SetClassName(newElement, className))
           case value => patchQueue.enqueue(SetAttribute(newElement, name, value.toString))
         }
       }
@@ -24,8 +26,8 @@ object Diff {
     for ((name, newValue) <- newElement.fields.iterator.zip(newElement.iterator)) {
       newValue match {
         case None =>
+        case Some(className: StyleA) => patchQueue.enqueue(SetClassName(newElement, className))
         case optionalValue: Some[_] => patchQueue.enqueue(SetAttribute(newElement, name, optionalValue.get.toString))
-        case className: ClassName => patchQueue.enqueue(SetClassName(newElement, className))
         case value => patchQueue.enqueue(SetAttribute(newElement, name, value.toString))
       }
     }

@@ -2,8 +2,10 @@ package proceed.diff.patch
 
 import org.scalajs.dom.raw
 import proceed.tree.html.TextNode
-import proceed.tree.{ClassName, DomNode, Element, Node}
+import proceed.tree.{DomNode, Element, Node}
 import proceed.util.log
+
+import scalacss.StyleA
 
 
 sealed trait Patch {
@@ -28,7 +30,6 @@ sealed trait Patch {
   def doWithDomNodeRef(parent: Node, toDo: raw.Node => Any): Any = {
     parent match {
       case e: DomNode => toDo(e.domRef.get)
-      case t: TextNode =>  toDo(t.domRef.get)
       case _ => log.error(s"Parent $parent is not an Element or TextNode.")
     }
   }
@@ -36,7 +37,6 @@ sealed trait Patch {
   def doWithSibblingDomRef(sibbling: Option[Node], toDo: raw.Node => Any, elseDo: () => Any): Any = {
     sibbling match {
       case Some(e: DomNode) => toDo(e.domRef.get)
-      case Some(t: TextNode) => toDo(t.domRef.get)
       case _ => elseDo()
     }
   }
@@ -93,11 +93,10 @@ case class SetAttribute(element: DomNode, attribute: String, value: String) exte
   }
 }
 
-case class SetClassName(element: DomNode, className: ClassName) extends Patch {
+case class SetClassName(element: DomNode, className: StyleA) extends Patch {
   def execute() = {
     log.debug(gap(element) + "  -> set ClassNames " + className +  " @ " + element)
-    if(className.size > 0)
-      doWithDomElementRef(element, _.setAttribute("class", className.toString()))
+    doWithDomElementRef(element, _.setAttribute("class", className.htmlClass))
   }
 }
 

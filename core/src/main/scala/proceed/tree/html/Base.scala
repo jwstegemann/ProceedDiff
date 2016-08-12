@@ -2,7 +2,9 @@ package proceed.tree.html
 
 import org.scalajs.dom
 import org.scalajs.dom.raw
-import proceed.tree.{ClassName, DomNode, Element}
+import proceed.tree.{DomNode, Element}
+
+import scalacss.StyleA
 
 /**
   * All basic html-elements
@@ -40,7 +42,8 @@ case class a(accessKey: Option[String] = None,
              title: Option[String] = None,
              lang: Option[String] = None,
              dir: Option[String] = None,
-             className: ClassName = "") extends Element {
+             className: Option[StyleA] = None,
+             style: Option[String] = None) extends Element {
 
   override val fields =
     "accessKey" ::
@@ -58,7 +61,8 @@ case class a(accessKey: Option[String] = None,
       "title" ::
       "lang" ::
       "dir" ::
-      "className" :: Nil
+      "className" ::
+      "style" :: Nil
 
   type DomNodeRefType = raw.HTMLAnchorElement
 }
@@ -72,7 +76,8 @@ case class button(accessKey: Option[String] = None,
                   lang: Option[String] = None,
                   dir: Option[String] = None,
                   typeName: Option[String] = None,
-                  className: ClassName = "") extends Element {
+                  className: Option[StyleA] = None,
+                    style: Option[String] = None) extends Element {
 
 
   override val fields =
@@ -85,7 +90,8 @@ case class button(accessKey: Option[String] = None,
       "lang" ::
       "dir" ::
       "typeName" ::
-      "className" :: Nil
+      "className" ::
+      "style" :: Nil
 
   type DomNodeRefType = raw.HTMLButtonElement
 }
@@ -94,14 +100,16 @@ case class div(align: Option[String] = None,
                title: Option[String] = None,
                lang: Option[String] = None,
                dir: Option[String] = None,
-               className: ClassName = "") extends Element {
+               className: Option[StyleA] = None,
+               style: Option[String] = None) extends Element {
 
   val fields =
     "align" ::
       "title" ::
       "lang" ::
       "dir" ::
-      "className" :: Nil
+      "className" ::
+      "style" :: Nil
 
   type DomNodeRefType = raw.HTMLDivElement
 }
@@ -126,7 +134,8 @@ case class input(defaultValue: Option[String] = None,
                  title: Option[String] = None,
                  lang: Option[String] = None,
                  dir: Option[String] = None,
-                 className: ClassName = "") extends Element {
+                 className: Option[StyleA] = None,
+                 style: Option[String] = None) extends Element {
 
   override val fields =
     "defaultValue" ::
@@ -149,7 +158,8 @@ case class input(defaultValue: Option[String] = None,
       "title" ::
       "lang" ::
       "dir" ::
-      "className" :: Nil
+      "className" ::
+      "style" :: Nil
 
   type DomNodeRefType = raw.HTMLInputElement
 }
@@ -158,13 +168,15 @@ case class p(align: Option[String] = None,
              title: Option[String] = None,
              lang: Option[String] = None,
              dir: Option[String] = None,
-             className: ClassName = "") extends Element {
+             className: Option[StyleA] = None,
+             style: Option[String] = None) extends Element {
 
   override val fields = "align" ::
     "title" ::
     "lang" ::
     "dir" ::
-    "className" :: Nil
+    "className" ::
+    "style" :: Nil
 
   type DomNodeRefType = raw.HTMLProgressElement
 }

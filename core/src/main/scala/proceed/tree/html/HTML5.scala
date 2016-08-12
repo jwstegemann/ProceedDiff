@@ -1,6 +1,6 @@
 package proceed.tree.html
 
-import proceed.tree.{ClassName, DomNode}
+import proceed.tree.DomNode
 
 /**
   * All new HTML5 Elements

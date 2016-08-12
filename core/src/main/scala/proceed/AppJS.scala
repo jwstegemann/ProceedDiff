@@ -1,97 +1,54 @@
 package proceed
 
-import proceed.events._
-import proceed.store.Store
+import proceed.style._
 import proceed.tree._
 import proceed.tree.html._
 
 import scala.scalajs.js.JSApp
+import scalacss.Defaults._
 
 
-object RangeStore extends Store {
+object MyStyle extends Style {
+  import dsl._
 
-  var from: Int = 0
-  var to: Int = 4
+  val common = mixin(
+    backgroundColor.green
+  )
 
-  def inc() = {
-    to += 1
-    emit()
-  }
+  val outer = style(
+    common, // Applying our mixin
+    margin(12 px, auto),
+    textAlign.left,
+    cursor.pointer,
 
-  def dec() = {
-    to -= 1
-    emit()
-  }
+    &.hover(
+      cursor.zoomIn
+    ),
 
+    media.not.handheld.landscape.maxWidth(640 px)(
+      width(400 px)
+    )
+  )
+
+  /** Style requiring an Int when applied. */
+  val indent =
+  styleF.int(0 to 3)(i => styleS(
+    paddingLeft(i * 2.ex)
+  ))
+
+  /** Style hooking into Bootstrap. */
+  val button = style(
+    addClassNames("btn", "btn-default")
+  )
 }
 
 
-case class SimpleComponent(p1: String, p2: Int) extends StatefullComponent[MyState] {
-
-  def increase(e: MouseEvent) : Any = {
-    RangeStore.inc()
-    update(_.to, state.to+1)
-  }
-
-  def storeTo(e: TextEvent) : Any = {
-    update(_.to, e.input.value.toInt)
-    RangeStore.to = e.input.value.toInt
-  }
+case class SimpleComponent() extends Component {
 
   override def view(): DomNode = {
-    println(s"rendering SimpleComponent with state.from=${state.from} and state.to=${state.to}")
-
     div()(
-//      input(defaultValue = RangeStore.to.toString) ! bind(Input)(_.to),
-      input(value = RangeStore.to.toString) ! onInput(_.storeTo),
-      p()(
-        s"Ihre Eingabe lautet: ${state.to}"
-      ),
-      p()(
-        "increase"
-      ).as("dummy") ! on(Click)(_.increase),
-      MiddleComponent(RangeStore.from, RangeStore.to)
-    )
-  }
-
-  override def init() = {
-    subscribe(RangeStore)
-  }
-
-  override def initialState() = MyState(0,4)
-
-}
-
-case class MyState(from: Int, to: Int)
-
-case class MiddleComponent(from: Int, to: Int) extends StatefullComponent[MyState] {
-
-  override def initialState() = MyState(from, to)
-
-  def decrease(x: Int)(e: MouseEvent) = {
-    RangeStore.dec()
-  }
-
-  override def view() = {
-    println(s"rendering cMiddleComponent y with state.from=${state.from} and state.to=${state.to}")
-
-    div()(
-      p()(
-        "decrease"
-      ).as("dummy") ! on(Click)(_.decrease(17)),
-      //        p().on(Click, this)((c: MiddleComponent, e: MouseEvent) => setState(state.copy(to = state.to-1))).as("dummy"),
-      MoreComplexComponent(from, to)
-    )
-
-  }
-}
-
-case class MoreComplexComponent(from: Int, to: Int) extends Component {
-  override def view(): DomNode = {
-    println(s"rendering MoreComplexComponent with from=$from and to=$to")
-
-    div()(
-      for (index <- Range(from, to)) yield p()(s"Eintrag Nr. $index") as s"p$index"
+      button(className = MyStyle.indent(1) + MyStyle.outer, style = "height: 30px"),
+      button(className = MyStyle.indent(3) + MyStyle.button)
     )
   }
 }
@@ -100,7 +57,8 @@ object AppJS extends JSApp {
 
   @scala.scalajs.js.annotation.JSExport
   override def main(): Unit = {
-    val c = SimpleComponent("test",17)
+    App.style(MyStyle)
+    val c = SimpleComponent()
     c.mount("mp")
   }
 

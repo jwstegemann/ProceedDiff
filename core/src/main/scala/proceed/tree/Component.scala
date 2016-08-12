@@ -9,6 +9,7 @@ import proceed.util.log
 import proceed.{App, DataBindingMacros}
 
 import scala.language.experimental.macros
+import scalacss.StyleA
 
 /**
   * Created by tiberius on 17.06.16.
@@ -96,11 +97,12 @@ abstract class Component extends Node with EventDelegate {
   implicit def string2Option(s: String): Option[String] = Some(s)
   implicit def boolean2Option(b: Boolean): Option[Boolean] = Some(b)
   implicit def int2Option(i: Int): Option[Int] = Some(i)
+  implicit def style2Option(c: StyleA): Option[StyleA] = Some(c)
 
-  implicit class String2ClassName(s: String) {
-    def add(x: String): ClassName = ClassName(s) add ClassName(x)
-    def addif(x: ClassName)(f: => Boolean) = ClassName(s).addif(x)(f)
-  }
+//  implicit class String2ClassName(s: String) {
+//    def add(x: String): ClassName = ClassName(s) add ClassName(x)
+//    def addif(x: ClassName)(f: => Boolean) = ClassName(s).addif(x)(f)
+//  }
 }
 
 

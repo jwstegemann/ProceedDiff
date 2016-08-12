@@ -27,7 +27,7 @@ lazy val core = (project in file("core")).settings(
     "org.scala-js"  %%%  "scalajs-dom"    % "0.9.0",
     "org.scala-lang" % "scala-reflect" % "2.11.8",
     "com.softwaremill.quicklens" %%% "quicklens" % "1.4.6",
-    "com.github.japgolly.scalacss" %% "core" % "0.4.1"
+    "com.github.japgolly.scalacss" %%% "core" % "0.4.1"
   ),
   testFrameworks += new TestFramework("utest.runner.Framework")
 ).enablePlugins(ScalaJSPlugin).dependsOn(macros)
